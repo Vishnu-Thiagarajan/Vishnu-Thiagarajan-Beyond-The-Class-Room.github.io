@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<!--
+  BEYOND THE CLASSROOM - Vishnu Thiagarajan
+  Personal Portfolio Website
+  ==========================================
+
+  HOW TO EDIT THIS FILE
+  Open this file in any text editor (Notepad, VS Code, TextEdit).
+  Save it, then refresh in your browser to see changes.
+
+  FONTS USED
+  Cormorant Garamond : headings, names, poem text (elegant serif)
+  DM Sans            : body text and paragraphs (clean sans-serif)
+  JetBrains Mono     : labels, tags, buttons (monospace)
+  All fonts load from Google Fonts - requires internet connection.
+
+  COLOUR PALETTE
+  The colours are defined as CSS variables inside the :root block.
+  bg         #080C10   Main background (near black)
+  bg-card    #0D1117   Card backgrounds
+  gold       #D4AF5A   Primary accent colour (gold)
+  red        #C41E3A   Red Phoenix project accent
+  blue       #4A7FA5   FarmSense project accent
+  text       #DDD9D0   Main body text
+  white      #F0EDE6   Headings and highlights
+  To change a colour, find var(--gold) etc. in the CSS and update the :root value.
+
+  SECTIONS IN ORDER
+  1. NAV           Fixed top navigation bar
+  2. HERO          Full-screen landing with name, tagline, stats grid
+  3. ABOUT         Personal intro and detail cards
+  4. THE STAGE     Public speaking and compering entries
+  5. ACHIEVEMENTS  Poem card and FarmSense award card
+  6. POEM MODAL    Full-screen overlay showing the poem text
+  7. PROJECTS      Expandable project cards
+  8. ACADEMICS     AP exams and standardised testing
+  9. FOOTER        Name and tagline
+
+  HOW TO ADD OR EDIT THINGS
+  
+  Change name, school, or grade:
+    Search for "Vishnu Thiagarajan" or "Class 12" in this file.
+
+  Add a new achievement or stage entry:
+    Find the ACHIEVEMENTS or THE STAGE section comment.
+    Copy one of the existing detail-row div blocks and edit the text inside.
+
+  Add a new project:
+    Find the HEAD TRACKING comment near the bottom of the projects list.
+    Copy a project-card block above it and give it a new unique id.
+    Update the toggle() calls to match the new id.
+
+  Replace placeholder images:
+    Search for "Add Image Here" in this file.
+    Replace the entire img-placeholder div with:
+    img src="your-image-filename.jpg" style="width:100%;display:block;"
+    For portrait images, just let the image set its own height naturally.
+
+  Replace the poem newsletter image:
+    Search for "Newsletter Feature Image" and do the same swap.
+
+  Add exam results when they arrive:
+    Find the Academics section. Change "Upcoming" badge text to the actual score.
+    Change class "badge-upcoming" to "badge-pending" for a gold colour badge.
+
+  Add a leadership role:
+    Add a new section between The Stage and Achievements sections.
+    Copy a detail-row block and a section header block as a template.
+
+  JAVASCRIPT FUNCTIONS (at the bottom of the file)
+  
+  toggle(id)
+    Opens or closes a project body from the top Read More button.
+    Scrolls down to reveal new content on open.
+    Scrolls back up to button on close with a slide animation.
+
+  closeProject(id)
+    Called by the bottom Close button inside each expanded project.
+    Plays the closing animation then compensates for layout shift
+    so the page does not jump when content collapses.
+
+  openPoem()
+    Opens the poem modal with a fade and slide-up animation.
+
+  closePoem(e)
+    Closes the poem modal with a reverse fade-down animation.
+    Works when called from the top button, bottom button, or backdrop click.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Beyond The Classroom | Vishnu Thiagarajan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#080C10; --bg-card:#0D1117; --bg-surface:#111820;
+      --text:#DDD9D0; --text-muted:#7A7870;
+      --gold:#D4AF5A; --gold-dim:rgba(212,175,90,0.10); --gold-border:rgba(212,175,90,0.22);
+      --red:#C41E3A; --red-dim:rgba(196,30,58,0.10);
+      --blue:#4A7FA5; --blue-dim:rgba(74,127,165,0.10);
+      --white:#F0EDE6;
+    }
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;overflow-x:hidden}
+
+    /* ── NAV ── */
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:1.1rem 4rem;background:rgba(8,12,16,0.88);backdrop-filter:blur(14px);border-bottom:1px solid var(--gold-border)}
+    .nav-logo{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:600;color:var(--gold);letter-spacing:0.18em;text-transform:uppercase;text-decoration:none}
+    .nav-links{display:flex;gap:2.5rem;list-style:none}
+    .nav-links a{color:var(--text-muted);text-decoration:none;font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;transition:color 0.3s}
+    .nav-links a:hover{color:var(--gold)}
+
+    /* ── HERO ── */
+    #hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;position:relative;overflow:hidden;padding:2rem}
+    .hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(212,175,90,0.035) 1px,transparent 1px),linear-gradient(90deg,rgba(212,175,90,0.035) 1px,transparent 1px);background-size:64px 64px;pointer-events:none}
+    .hero-vignette{position:absolute;inset:0;background:radial-gradient(ellipse 80% 80% at 50% 50%,transparent 20%,var(--bg) 80%);pointer-events:none}
+    .hero-tag{font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--gold);letter-spacing:0.35em;text-transform:uppercase;margin-bottom:1.6rem;opacity:0;animation:fadeUp 0.9s ease forwards 0.3s}
+    .hero-name{font-family:'Cormorant Garamond',serif;font-size:clamp(3.5rem,9vw,8.5rem);font-weight:600;color:var(--white);line-height:0.93;letter-spacing:-0.02em;margin-bottom:1.6rem;opacity:0;animation:fadeUp 0.9s ease forwards 0.5s}
+    .hero-name span{color:var(--gold)}
+    .hero-divider{width:72px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:0 auto 1.6rem;opacity:0;animation:fadeUp 0.9s ease forwards 0.7s}
+    .hero-tagline{font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:300;color:var(--text-muted);letter-spacing:0.28em;text-transform:uppercase;margin-bottom:3.5rem;opacity:0;animation:fadeUp 0.9s ease forwards 0.9s}
+    .hero-stats{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:0;opacity:0;animation:fadeUp 0.9s ease forwards 1.1s;width:min(420px,90vw);border:1px solid var(--gold-border)}
+    .hero-stat{text-align:center;padding:1.5rem 1rem;border:1px solid var(--gold-border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem;min-height:110px}
+    .hero-stat-num{font-family:'Cormorant Garamond',serif;font-size:1.75rem;font-weight:600;color:var(--gold);line-height:1}
+    .hero-stat-label{font-family:'JetBrains Mono',monospace;font-size:0.48rem;color:var(--text-muted);letter-spacing:0.13em;text-transform:uppercase;line-height:1.8;text-align:center}
+    .scroll-hint{position:absolute;bottom:2.2rem;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:0.5rem;opacity:0;animation:fadeUp 0.9s ease forwards 1.5s}
+    .scroll-hint span{font-family:'JetBrains Mono',monospace;font-size:0.58rem;color:var(--text-muted);letter-spacing:0.22em;text-transform:uppercase}
+    .scroll-line{width:1px;height:36px;background:linear-gradient(to bottom,var(--gold),transparent);animation:scrollPulse 2.2s ease-in-out infinite}
+
+    /* ── LAYOUT ── */
+    .section-wrap{padding:7rem 4rem;max-width:1200px;margin:0 auto}
+    .section-wrap-dark{background:#090D11;padding:7rem 0}
+    .section-wrap-dark .section-inner{max-width:1200px;margin:0 auto;padding:0 4rem}
+    .section-header{display:flex;align-items:center;gap:1.5rem;margin-bottom:4rem}
+    .section-tag{font-family:'JetBrains Mono',monospace;font-size:0.63rem;color:var(--gold);letter-spacing:0.3em;text-transform:uppercase}
+    .section-title{font-family:'Cormorant Garamond',serif;font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;color:var(--white)}
+    .section-line{flex:1;height:1px;background:var(--gold-border)}
+
+    /* ── ABOUT ── */
+    .about-grid{display:grid;grid-template-columns:1.1fr 0.9fr;gap:4.5rem;align-items:start}
+    .about-text p{font-size:1rem;line-height:2.05;color:var(--text);margin-bottom:1.3rem}
+    .about-text p strong{color:var(--gold);font-weight:500}
+    .about-text p:last-child{margin-bottom:0}
+    .detail-rows{display:flex;flex-direction:column;gap:0.85rem}
+    .detail-row{display:flex;align-items:flex-start;gap:1rem;padding:0.9rem 1.2rem;background:var(--bg-card);border:1px solid var(--gold-border);border-left:2px solid var(--gold)}
+    .detail-label{font-family:'JetBrains Mono',monospace;font-size:0.58rem;color:var(--gold);letter-spacing:0.18em;text-transform:uppercase;min-width:78px;padding-top:0.2rem;flex-shrink:0}
+    .detail-value{font-size:0.86rem;color:var(--text);line-height:1.65}
+
+    /* ── PROJECTS ── */
+    .projects-list{display:flex;flex-direction:column;gap:1.75rem}
+    .project-card{background:var(--bg-card);border:1px solid var(--gold-border);overflow:hidden;transition:border-color 0.35s,box-shadow 0.35s}
+    .project-card:hover{border-color:rgba(212,175,90,0.45);box-shadow:0 4px 40px rgba(0,0,0,0.4)}
+    .project-card.accent-gold{border-left:3px solid var(--gold)}
+    .project-card.accent-red{border-left:3px solid var(--red)}
+    .project-card.accent-blue{border-left:3px solid var(--blue)}
+    .project-card.accent-gray{border-left:3px solid var(--text-muted);opacity:0.82}
+    .project-header{display:flex;justify-content:space-between;align-items:flex-start;padding:2rem 2.5rem 1.5rem;cursor:pointer}
+    .project-title-area{flex:1}
+    .tag-row{display:flex;gap:0.6rem;flex-wrap:wrap;margin-bottom:0.8rem}
+    .tag{font-family:'JetBrains Mono',monospace;font-size:0.56rem;letter-spacing:0.13em;text-transform:uppercase;padding:0.22rem 0.55rem;border:1px solid}
+    .tag-gold{color:var(--gold);border-color:rgba(212,175,90,0.3);background:var(--gold-dim)}
+    .tag-red{color:var(--red);border-color:rgba(196,30,58,0.3);background:var(--red-dim)}
+    .tag-blue{color:var(--blue);border-color:rgba(74,127,165,0.3);background:var(--blue-dim)}
+    .tag-gray{color:var(--text-muted);border-color:rgba(122,120,112,0.3);background:rgba(122,120,112,0.07)}
+    .project-name{font-family:'Cormorant Garamond',serif;font-size:clamp(1.35rem,2.4vw,1.85rem);font-weight:600;color:var(--white);margin-bottom:0.35rem}
+    .project-subtitle{font-size:0.83rem;color:var(--text-muted);font-style:italic}
+    .toggle-btn{display:none}
+    .read-more-btn{display:block;width:100%;margin-top:1.6rem;padding:0.85rem 1.5rem;font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--gold);letter-spacing:0.18em;text-transform:uppercase;border:1px solid var(--gold-border);background:transparent;cursor:pointer;transition:background 0.25s,border-color 0.25s,color 0.25s;text-align:center}
+    .read-more-btn:hover{background:var(--gold-dim);border-color:rgba(212,175,90,0.45)}
+    .read-more-btn.active{background:var(--gold);color:#080C10;border-color:var(--gold);font-weight:600}
+
+    /* summary always visible */
+    .project-summary{padding:0 2.5rem 2.2rem}
+    .project-summary p{font-size:0.97rem;line-height:2.05;color:var(--text);margin-bottom:1rem}
+    .project-summary p:last-child{margin-bottom:0}
+
+    /* expandable body */
+    @keyframes slideDown{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes slideUp{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-12px)}}
+    .project-body{display:none;padding:2.2rem 2.5rem 2.5rem;border-top:1px solid var(--gold-border)}
+    .project-body.open{display:block;animation:slideDown 0.45s ease forwards}
+    .project-body.closing{display:block;animation:slideUp 0.35s ease forwards}
+
+    .close-btn-bottom{display:block;width:100%;margin-top:2.5rem;padding:1rem 1.5rem;font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--text);letter-spacing:0.22em;text-transform:uppercase;border:1px solid rgba(212,175,90,0.25);background:rgba(255,255,255,0.03);cursor:pointer;transition:background 0.25s,color 0.25s,border-color 0.25s;text-align:center}
+    .close-btn-bottom:hover{background:rgba(212,175,90,0.08);color:var(--gold);border-color:var(--gold-border)}
+    .prose-section{margin-bottom:2.4rem}
+    .prose-section:last-child{margin-bottom:0}
+    .prose-section h4{font-family:'JetBrains Mono',monospace;font-size:0.58rem;color:var(--gold);letter-spacing:0.22em;text-transform:uppercase;margin-bottom:1rem;padding-bottom:0.5rem;border-bottom:1px solid var(--gold-border)}
+    .prose-section p{font-size:0.95rem;color:var(--text);line-height:2;margin-bottom:1rem}
+    .prose-section p:last-child{margin-bottom:0}
+
+    /* tech notes box */
+    .tech-notes{margin-top:2.8rem;padding:1.4rem 1.6rem;background:var(--bg-surface);border:1px solid rgba(122,120,112,0.25);border-left:2px solid var(--text-muted)}
+    .tech-notes-label{font-family:'JetBrains Mono',monospace;font-size:0.54rem;color:var(--text-muted);letter-spacing:0.24em;text-transform:uppercase;margin-bottom:0.75rem}
+    .tech-notes p{font-size:0.81rem;color:var(--text-muted);line-height:1.8}
+
+    .img-placeholder{width:100%;height:190px;margin-top:2rem;background:var(--bg-surface);border:1px dashed var(--gold-border);display:flex;align-items:center;justify-content:center}
+    .img-placeholder span{font-family:'JetBrains Mono',monospace;font-size:0.58rem;color:var(--text-muted);letter-spacing:0.2em;text-transform:uppercase}
+
+    /* ── ACADEMICS ── */
+    .academics-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.75rem}
+    .ac-card{background:var(--bg-card);border:1px solid var(--gold-border);padding:1.75rem 2rem}
+    .ac-card h3{font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:600;color:var(--white);margin-bottom:1.1rem}
+    .exam-row{display:flex;justify-content:space-between;align-items:center;padding:0.58rem 0;border-bottom:1px solid rgba(212,175,90,0.09)}
+    .exam-row:last-child{border-bottom:none}
+    .exam-name{font-size:0.86rem;color:var(--text)}
+    .exam-badge{font-family:'JetBrains Mono',monospace;font-size:0.56rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.2rem 0.5rem;border:1px solid;flex-shrink:0;margin-left:0.5rem}
+    .badge-pending{color:var(--gold);border-color:rgba(212,175,90,0.35)}
+    .badge-upcoming{color:var(--blue);border-color:rgba(74,127,165,0.35)}
+    .note-row{margin-top:1.2rem;padding:0.9rem 1rem;background:var(--gold-dim);border-left:2px solid var(--gold)}
+    .note-row p{font-size:0.82rem;color:var(--text-muted);font-style:italic;line-height:1.6}
+
+    @keyframes modalFadeIn{from{opacity:0}to{opacity:1}}
+    @keyframes modalFadeOut{from{opacity:1}to{opacity:0}}
+    @keyframes modalSlideIn{from{opacity:0;transform:translateY(28px) scale(0.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+    @keyframes modalSlideOut{from{opacity:1;transform:translateY(0) scale(1)}to{opacity:0;transform:translateY(28px) scale(0.97)}}
+    #poem-modal.opening{animation:modalFadeIn 0.35s ease forwards}
+    #poem-modal.closing-modal{animation:modalFadeOut 0.3s ease forwards}
+    #poem-modal-inner.opening{animation:modalSlideIn 0.4s cubic-bezier(0.22,1,0.36,1) forwards}
+    #poem-modal-inner.closing-modal{animation:modalSlideOut 0.28s ease forwards}
+    footer{border-top:1px solid var(--gold-border);padding:3rem 4rem;text-align:center}
+    .footer-name{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:600;color:var(--gold);letter-spacing:0.1em;margin-bottom:0.5rem}
+    .footer-sub{font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--text-muted);letter-spacing:0.25em;text-transform:uppercase}
+
+    /* ── ANIMATION ── */
+    @keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes scrollPulse{0%,100%{opacity:1}50%{opacity:0.25}}
+    .fade-in{opacity:0;transform:translateY(22px);transition:opacity 0.75s ease,transform 0.75s ease}
+    .fade-in.visible{opacity:1;transform:translateY(0)}
+
+    @media(max-width:900px){
+      nav{padding:1rem 1.5rem}
+      .nav-links{display:none}
+      .section-wrap,.section-wrap-dark .section-inner{padding:4rem 1.2rem}
+      .about-grid{grid-template-columns:1fr;gap:2.5rem}
+      .academics-grid{grid-template-columns:1fr}
+      footer{padding:2rem 1.5rem}
+      .section-wrap-dark{padding:4rem 0}
+      .project-header{padding:1.5rem 1.2rem 1rem}
+      .project-summary{padding:0 1.2rem 1.5rem}
+      .project-body{padding:1.5rem 1.2rem 2rem}
+      .hero-name{font-size:clamp(2.8rem,13vw,5rem)}
+    }
+    @media(max-width:480px){
+      .section-wrap,.section-wrap-dark .section-inner{padding:3rem 1rem}
+      .ac-card{padding:1.2rem 1rem}
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════ NAV -->
+<nav>
+  <a class="nav-logo" href="#hero">V. Thiagarajan</a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#stage">The Stage</a></li>
+    <li><a href="#achievements">Achievements</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#academics">Academics</a></li>
+  </ul>
+</nav>
+
+
+<!-- ══════════════════════════════════════ HERO -->
+<section id="hero" style="padding:0;max-width:none">
+  <div class="hero-grid"></div>
+  <div class="hero-vignette"></div>
+  <div class="hero-tag">Beyond The Classroom</div>
+  <h1 class="hero-name">Vishnu<br><span>Thiagarajan</span></h1>
+  <div class="hero-divider"></div>
+  <p class="hero-tagline">Innovator &nbsp;·&nbsp; Thinker &nbsp;·&nbsp; Creator</p>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="hero-stat-num">Published</div>
+      <div class="hero-stat-label">Sonnet in School<br>Newsletter</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">90s</div>
+      <div class="hero-stat-label">Rubik's Cube<br>Average · Solve Time</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">3</div>
+      <div class="hero-stat-label">Major Hardware<br>Projects</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">1st</div>
+      <div class="hero-stat-label">Place · School<br>Computer Fair</div>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════ ABOUT -->
+<section id="about" style="padding:0;max-width:none">
+  <div class="section-wrap">
+    <div class="section-header fade-in">
+      <span class="section-tag">01</span>
+      <h2 class="section-title">About</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="about-grid">
+
+      <div class="about-text fade-in">
+        <p>Aviation has been woven into my identity since childhood. My father holds a private pilot licence, and my earliest memory of wonder is gripping a joystick and watching a virtual aircraft climb skyward. <strong style="color:var(--gold);">That feeling never left me.</strong></p>
+        <p>But what aviation really gave me was my first business instinct. Every piece of hardware I needed was either overpriced, poorly designed, or simply absent from the market. And every time the market failed me, I stopped accepting it as a permanent condition. The gap between an expensive solution and no solution is exactly where innovation lives — <strong style="color:var(--gold);">and that gap is where I have chosen to spend my time.</strong></p>
+        <p>I am not just a commerce student — I am also an innovator. The instinct that drives me toward entrepreneurship and the instinct that drives me to build things with my hands are not separate. They are exactly the same mindset applied to different materials. I look at a market that is wrong and ask whether something better can simply be built. That question has produced a throttle controller, a set of rudder pedals, and a first place trophy at a school computer fair — all before sixteen. <strong style="color:var(--gold);">One day it will produce businesses.</strong></p>
+      </div>
+
+      <div class="detail-rows fade-in">
+        <div class="detail-row">
+          <span class="detail-label">School</span>
+          <span class="detail-value">Jeevana School &nbsp;·&nbsp; Class 12-D</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Languages</span>
+          <span class="detail-value">English &nbsp;·&nbsp; Tamil</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Interests</span>
+          <span class="detail-value">Aviation, Entrepreneurship, 3D Printing, Chess, Computer Science</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Rubik's Cube</span>
+          <span class="detail-value">Average solve time approximately 1 min 30 sec</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Simulation</span>
+          <span class="detail-value">DCS World — Digital Combat Simulator &nbsp;·&nbsp; Custom-built cockpit hardware</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">3D Printing</span>
+          <span class="detail-value">Ender 3 Neo &nbsp;·&nbsp; Functional mechanical parts &amp; prototyping</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════ THE STAGE -->
+<section id="stage" style="padding:0;max-width:none">
+  <div class="section-wrap">
+    <div class="section-header fade-in">
+      <span class="section-tag">02</span>
+      <h2 class="section-title">The Stage</h2>
+      <div class="section-line"></div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:1.4rem;">
+
+      <div class="detail-row fade-in" style="flex-direction:column;gap:0.7rem;padding:1.5rem 2rem;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.5rem;">
+          <span style="font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:600;color:var(--white);">Co-Compère &amp; Welcome Address — Investiture Ceremony</span>
+          <span class="tag tag-gold" style="flex-shrink:0;">Jeevana School · 2025–26</span>
+        </div>
+        <p style="font-size:0.9rem;color:var(--text);line-height:1.85;">I co-hosted the Investiture Ceremony at Jeevana School — one of the most prestigious annual events in the school calendar, marking the formal appointment of the school's student leadership body. I also delivered the welcome address, opening the ceremony in front of an audience of over 500 people.</p>
+      </div>
+
+      <div class="detail-row fade-in" style="flex-direction:column;gap:0.7rem;padding:1.5rem 2rem;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.5rem;">
+          <span style="font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:600;color:var(--white);">Co-Compère &amp; Welcome Address — English Day</span>
+          <span class="tag tag-gold" style="flex-shrink:0;">Jeevana School · 2025</span>
+        </div>
+        <p style="font-size:0.9rem;color:var(--text);line-height:1.85;">I co-hosted Jeevana School's annual English Day — a celebration dedicated to showcasing the beauty, depth, and range of the English language to its students. I also delivered the welcome address, opening the event for the school audience.</p>
+      </div>
+
+      <div class="detail-row fade-in" style="flex-direction:column;gap:0.7rem;padding:1.5rem 2rem;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.5rem;">
+          <span style="font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:600;color:var(--white);">Speech — The Unwavering Lotus</span>
+          <span class="tag tag-gold" style="flex-shrink:0;">Class Presentation · Grade 11</span>
+        </div>
+        <p style="font-size:0.9rem;color:var(--text);line-height:1.85;">I delivered a speech on the importance of perseverance at my class presentation in eleventh standard. The central image was the lotus — a flower that roots itself in mud and blooms above the water regardless of the conditions beneath it. The message to my fellow students was this: the environment you are placed in does not determine what you become — what determines it is whether you keep growing.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════ ACHIEVEMENTS -->
+<section id="achievements" style="padding:0;max-width:none;background:#090D11;">
+  <div class="section-wrap">
+    <div class="section-header fade-in">
+      <span class="section-tag">03</span>
+      <h2 class="section-title">Achievements</h2>
+      <div class="section-line"></div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:1.2rem;max-width:680px;">
+
+      <!-- Poem -->
+      <div class="project-card accent-gold fade-in" style="cursor:pointer;" onclick="openPoem()">
+        <div style="padding:1.75rem 2rem;">
+          <div class="tag-row">
+            <span class="tag tag-gold">Published</span>
+            <span class="tag tag-gold">School Newsletter</span>
+          </div>
+          <div class="project-name" style="font-size:1.25rem;margin-bottom:0.4rem;">If Only These Walls Could Talk</div>
+          <p style="font-size:0.86rem;color:var(--text);line-height:1.8;margin-bottom:1.1rem;">A sonnet I wrote that was selected and featured in the Jeevana School newsletter — accompanied by an illustration commissioned by the school.</p>
+          <button style="margin-top:0.4rem;padding:0.75rem 1.6rem;font-family:'JetBrains Mono',monospace;font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;color:#080C10;background:var(--gold);border:none;cursor:pointer;width:100%;font-weight:600;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">Read the Poem</button>
+        </div>
+      </div>
+
+      <!-- Computer Fair -->
+      <div class="project-card accent-blue fade-in" style="cursor:pointer;" onclick="document.getElementById('projects').scrollIntoView({behavior:'smooth',block:'start'})">
+        <div style="padding:1.75rem 2rem;">
+          <div class="tag-row">
+            <span class="tag tag-gold">🏆 1st Place</span>
+            <span class="tag tag-blue">School Computer Fair</span>
+          </div>
+          <div class="project-name" style="font-size:1.25rem;margin-bottom:0.4rem;">Project FarmSense</div>
+          <p style="font-size:0.86rem;color:var(--text);line-height:1.8;margin-bottom:1.1rem;">Our team's solar-powered plant monitoring station won first place at the school computer fair. Built for ₹1,199 with no mains power and no internet dependency.</p>
+          <button style="margin-top:0.4rem;padding:0.75rem 1.6rem;font-family:'JetBrains Mono',monospace;font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;color:#fff;background:var(--blue);border:none;cursor:pointer;width:100%;font-weight:600;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">View Project</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Poem Modal -->
+<div id="poem-modal" style="display:none;position:fixed;inset:0;z-index:999;background:rgba(8,12,16,0.96);backdrop-filter:blur(12px);overflow-y:auto;padding:2rem 1rem;" onclick="closePoem(event)">
+  <div id="poem-modal-inner" style="max-width:580px;margin:4rem auto;background:var(--bg-card);border:1px solid var(--gold-border);padding:3rem;" onclick="event.stopPropagation()">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2rem;">
+      <div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--gold);letter-spacing:0.25em;text-transform:uppercase;margin-bottom:0.6rem;">Published · Jeevana School Newsletter · 2026</div>
+        <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.9rem;font-weight:600;color:var(--white);font-style:italic;">If Only These Walls Could Talk</h2>
+        <p style="font-size:0.8rem;color:var(--text-muted);margin-top:0.4rem;">— Vishnu Thiagarajan</p>
+      </div>
+      <button onclick="closePoem()" style="padding:0.45rem 1rem;font-family:'JetBrains Mono',monospace;font-size:0.58rem;letter-spacing:0.15em;text-transform:uppercase;color:#080C10;background:var(--gold);border:none;cursor:pointer;font-weight:600;flex-shrink:0;margin-left:1rem;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">Close ✕</button>
+    </div>
+
+    <!-- Newsletter image -->
+    <img src="poem-newsletter.jpeg" style="width:100%;display:block;margin-bottom:2.5rem;" alt="If Only These Walls Could Talk — published in Jeevana School Newsletter">
+
+    <!-- Poem text -->
+    <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--text);line-height:2.1;">
+      <p>If only these walls could talk,<br>
+      They would narrate stories of young faces,<br>
+      Who rush eyeing the clock,<br>
+      At the bell organising their races.</p>
+
+      <p style="margin-top:1.4rem;">In these halls, strong friendships grew,<br>
+      Of which some withstood the test of time,<br>
+      While others unfortunately fell through,<br>
+      As the walls watched in silent mime.</p>
+
+      <p style="margin-top:1.4rem;">Uniforms well worn became faded,<br>
+      Shoes grew large, voices grew deep,<br>
+      As the past for the future they traded,<br>
+      And the joys of school life they learnt to reap.</p>
+
+      <p style="margin-top:1.4rem;">Though the years pass swiftly and students drift apart,<br>
+      Preserved within these silent walls is their joyful heart.</p>
+    </div>
+
+      <p style="margin-top:2rem;font-family:'JetBrains Mono',monospace;font-size:0.65rem;font-weight:700;color:var(--gold);letter-spacing:0.25em;text-align:center;">— BY VISHNU THIAGARAJAN —</p>
+
+    <div style="text-align:center;margin-top:2rem;">
+      <button onclick="closePoem()" style="padding:0.75rem 2.5rem;font-family:'JetBrains Mono',monospace;font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;color:#080C10;background:var(--gold);border:none;cursor:pointer;font-weight:600;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">Close ✕</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════ PROJECTS -->
+<div class="section-wrap-dark" id="projects">
+  <div class="section-inner">
+    <div class="section-header fade-in">
+      <span class="section-tag">04</span>
+      <h2 class="section-title">Projects</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="projects-list">
+
+
+      <!-- ─────────────── PROJECT FARMSENSE ─────────────── -->
+      <div class="project-card accent-blue fade-in">
+        <div class="project-header" onclick="toggle('farm')">
+          <div class="project-title-area">
+            <div class="tag-row">
+              <span class="tag tag-blue">Team Project</span>
+              <span class="tag tag-blue">Solar Powered</span>
+              <span class="tag tag-blue">Age 15</span>
+              <span class="tag tag-gold">🏆 1st Place</span>
+            </div>
+            <div class="project-name">Project FarmSense — Smart Plant Monitor</div>
+            <div class="project-subtitle">A device that monitors soil and weather using only sunlight as its power source. No cables. No internet. No ongoing cost. 1st place, school computer fair. Built for ₹1,199.</div>
+          </div>
+          <button class="toggle-btn" id="btn-farm">Read More ↓</button>
+        </div>
+
+        <div class="project-summary">
+          <p>When our school assigned a computer fair project, most teams built something safe and familiar. My team and I wanted to do something different — we wanted to build something that would actually be useful to a real person in a real situation, something that solved a genuine problem rather than just demonstrating a technical capability.</p>
+          <p>The question we started with was this: how do you give a farmer or a gardener useful, live information about their soil and their environment, without asking them to install a power cable, connect to the internet, or pay anything to keep it running? The answer was FarmSense. Our team built a device that reads moisture in the soil, air temperature, and humidity, displays all three live on a small screen, runs entirely on a solar panel, and costs nothing to operate after the initial setup. Total build cost across all components: ₹1,199. The team won first place at the school computer fair.</p>
+          <button class="read-more-btn" id="btn-farm" onclick="toggle('farm')">Read More ↓</button>
+        </div>
+
+        <div class="project-body" id="body-farm">
+
+          <div class="prose-section">
+            <h4>The Team</h4>
+            <p>FarmSense was built with two classmates — Deepan Kishore and Ajay Krishna. Deepan took on parts of the sensor code, and Ajay contributed to the research and early planning phase. I handled the power system design, the final integration of all components, the soldering, and resolving a software conflict that was preventing the display from showing data. But what I remember most is not the division of tasks — it is the fact that we were genuinely aligned on what we were trying to make. When a team agrees on the goal from the very beginning, the work finds its own shape. That alignment is what took a school assignment and turned it into something that actually won.</p>
+          </div>
+
+          <div class="prose-section">
+            <h4>The Thinking Behind It</h4>
+            <p>The three constraints the team set from the beginning were non-negotiable: no mains power, no internet connection, no ongoing cost. Everything else in the design flowed from those three requirements. We did not start with what would be easy to build and work toward something useful. We started with what would be genuinely useful and worked backward to figure out how to build it.</p>
+            <p>Setting constraints first changes what you end up making. Starting from what was convenient would have produced something that plugged into a wall and sent data to a phone app — the kind of thing dozens of commercial products already do. Starting from "no power cable, no internet, no cost" forced a completely different approach and produced something that can work in a field far from any infrastructure, indefinitely, without anyone needing to manage it.</p>
+          </div>
+
+          <div class="prose-section">
+            <h4>What the Device Does</h4>
+            <p>FarmSense is a compact, self-contained unit. It has a sensor you push into the soil, which measures how much moisture is present. It also reads the air temperature and the relative humidity of the surrounding environment. All three of these readings are shown live on a small screen attached to the unit. The readings update continuously.</p>
+            <p>The device is powered by a small solar panel. During the day, the solar panel generates electricity and stores the surplus in a rechargeable battery inside the unit. At night, or on cloudy days, the device draws from that stored energy and keeps running. The battery system is protected in both directions — it will not be overcharged when there is excess solar power, and it will not be drained to the point of permanent damage during extended low-light periods. Both of those protections happen automatically, with no action required from the user.</p>
+            <p>Once deployed — sensor in the soil, panel facing the sun — the device runs by itself. There is nothing to maintain, nothing to charge, nothing to configure. It simply works.</p>
+          </div>
+
+          <div class="prose-section">
+            <h4>The Result</h4>
+            <p>Every single component in FarmSense cost ₹1,199 in total — roughly the price of a single meal at a mid-range restaurant. The project was fully functional, cleanly presented, and won first place at the school computer fair.</p>
+            <p>What FarmSense taught me, more than anything else, was what it actually feels like to build something as part of a team rather than alone. Working toward a shared goal — where every person's contribution shapes the final outcome — produces something different than working solo. The alignment we had from the very beginning, that shared clarity about what we were trying to make and why, is what turned a school assignment into something that actually won. That is a quality I intend to bring to every team I build and every business I lead.</p>
+          </div>
+
+          <div class="tech-notes">
+            <div class="tech-notes-label">Technical Notes — For Technical Readers</div>
+            <p>Microcontroller: ESP32 development board. Sensors: DHT22 temperature and humidity sensor, capacitive soil moisture sensor. Display: OLED screen. Power architecture: 6V 180mA solar panel → LM2596S buck converter (regulated to 5V) → TP4056 Li-ion charger module with protection → 18650 Li-ion cell (2200mAh) → MT3608 boost converter (stable 5V output rail) → ESP32 and peripherals. One-directional power path prevents backflow noise and voltage spikes. Trickle-charge behaviour cuts off near 4.2V cell voltage. Deep-discharge protection disconnects load at low cell voltage to preserve cycle life. Total BOM: ₹1,199. Custom cardboard enclosure with decorative leaf graphic.</p>
+          </div>
+
+          <div class="img-placeholder">
+            <span>[ Photo — FarmSense Unit &amp; Circuit Diagram — Add Image Here ]</span>
+          </div>
+          <button class="close-btn-bottom" onclick="closeProject('farm')">— Close —</button>
+
+        </div>
+      </div><!-- end FarmSense -->
+      <div class="project-card accent-gold fade-in">
+        <div class="project-header" onclick="toggle('hotas')">
+          <div class="project-title-area">
+            <div class="tag-row">
+              <span class="tag tag-gold">Self-Funded</span>
+              <span class="tag tag-gold">Aviation</span>
+              <span class="tag tag-gold">Age 15</span>
+              <span class="tag tag-gold">6 Months</span>
+            </div>
+            <div class="project-name">Project HOTAS — Throttle Quadrant</div>
+            <div class="project-subtitle">Built from scratch after the commercial option cost too much. Six months. Seventeen redesigns. One working result.</div>
+          </div>
+          <button class="toggle-btn" id="btn-hotas">Read More ↓</button>
+        </div>
+
+        <div class="project-summary">
+          <p>I fly a military-grade flight simulator called DCS World — think of it as the most realistic aircraft simulation available to the public outside an actual cockpit. For a long time, I had a frustrating problem: both engines on my twin-engine aircraft were controlled by a single lever on my joystick. In combat, when one engine took damage, I had no way to manage the two independently. I needed a dedicated controller with two separate levers — one for each engine — so that even a damaged aircraft could be kept in the air.</p>
+          <p>The hardware I needed starts at around ₹25,000 from commercial brands. At fifteen years old, with no engineering background and no formal training of any kind, I decided to build one from scratch instead. What followed was six months of designing, printing, testing, failing, and redesigning — and what came out the other side taught me about resilience in a way I strive to bring to everything I do.</p>
+          <button class="read-more-btn" id="btn-hotas" onclick="toggle('hotas')">Read More ↓</button>
+        </div>
+
+        <div class="project-body" id="body-hotas">
+
+          <div class="prose-section">
+            <h4>Where It Began</h4>
+            <p>I remember the exact moment the project started. I was studying when a notification appeared on my phone showing a component I had never seen before — a sliding potentiometer. It is a simple part: you slide it back and forth, and the device connected to it reads how far along the slider is. The moment I saw it, I realised that two of these, placed side by side, could act as two completely independent engine levers. A few toggle switches would become buttons. The entire controller I needed could theoretically be built from individual parts for a fraction of what brands were charging.</p>
+            <p>I added the components to my cart, finished my studying, and the project had begun.</p>
+          </div>
+
+          <div class="prose-section">
+            <h4>Seventeen Redesigns</h4>
+            <p>The most time-consuming part of the entire project was designing the casing — the physical housing that holds all the buttons, switches, and levers in place. I had no prior experience designing objects in three dimensions, so I learned entirely by doing: designing something, printing it, finding all the things that were wrong, and starting again.</p>
+            <p>I went through seventeen major versions of the main casing. Many of those versions had multiple sub-versions — small adjustments that each got their own print and test — before being replaced entirely by the next major version. The version numbering started over at version one each time a design changed fundamentally enough to warrant it, and some sub-versions counted up to 0.9 before the next major reset. It was a long process.</p>
+            <p>The key insight that made all of this manageable was realising I did not need to print the full casing each time to check whether measurements were correct. A complete print took seventeen hours. But the critical holes and mounting points all sit at the bottom of the design — which meant printing just the first few layers, which took around twenty minutes, was enough to check whether everything was in the right position. I could find a problem, fix it, and test again all within the same evening. That one realisation compressed what would have been a months-long process of waiting into something I could iterate through quickly.</p>
+          </div>
+
+          <div class="prose-section">
+            <h4>Problems Solved Along the Way</h4>
+            <p>My 3D printer had a persistent issue throughout this project: it consistently printed holes slightly smaller than the design specified. Screws and components that should have fit did not. I worked through this in two ways. For holes that were close to the right size, I enlarged them manually using a drill I had improvised from an old electric hair trimmer with a thin blade attachment. For more significant mismatches, I redesigned specific parts to account for the printer's consistent offset rather than fighting it every time.</p>
+            <p>I also built something into the controller's software that I am particularly proud of. If you flip one specific switch on the controller before plugging it in, the device changes its behaviour entirely: instead of appearing on the computer as a game controller, it appears as an editable storage drive. This means I can update settings, adjust sensitivity, and change any part of the configuration without ever opening the hardware and without needing any special tools. It was a small design decision, but it made ongoing development and maintenance dramatically cleaner.</p>
+            <p>Later in the build, I noticed that the wiring running from one of the handles was starting to show signs of stress. Every time I moved the throttle to full power and back, the same point in the wire was bending sharply. If I had left it, the wire would eventually have broken at that point. Instead, I redesigned the way the wires were routed so that the tension was spread across three separate sections rather than concentrated at one. I worked that solution out entirely on my own, without looking anything up. The wiring has been running without issue ever since.</p>
+          </div>
+
+          <div class="prose-section">
+            <h4>The Finished Result</h4>
+            <p>The finished controller has two fully independent engine levers, ten switches and buttons across the base and the handles, a small joystick on the right handle for fine control inputs, a rotary dial for mixture control on older aircraft types, and the master arm switch that doubles as the boot-mode selector I described. The whole thing runs on a small microcontroller that I programmed myself.</p>
+            <p>Every component that wears out from regular use — the sliding potentiometers, primarily, which I have already replaced three to four times — can be swapped in under five minutes, without soldering and without any special tools. That was a deliberate design decision I made from the beginning: the controller had to be maintainable long-term without becoming a complicated repair job. I funded the entire build personally and completed it at fifteen years old, while keeping up with all academic commitments.</p>
+          </div>
+
+          <div class="prose-section">
+            <h4>What I Took From It</h4>
+            <p>This project changed the way I see problems. Before it, I was a consumer of technology — someone who used things other people had built. After it, I understood that almost anything can be made by someone willing to iterate past the point where most people give up. The gap between an overpriced solution and no solution at all is not a dead end. It is exactly where the most interesting work happens.</p>
+            <p>That is the insight I want to bring to every business I build. Find where the market is wrong — overpriced, poorly designed, or simply absent — ask whether you can build something better, and keep going until you can.</p>
+          </div>
+
+          <div class="tech-notes">
+            <div class="tech-notes-label">Technical Notes — For Technical Readers</div>
+            <p>Microcontroller: Raspberry Pi Pico running CircuitPython. Inputs: 2 sliding potentiometers (independent split-throttle axes), 6 push buttons on base panel, 1 push button and 1 ministick with indent on right handle, 2-way and 3-way toggle switches, LED master arm toggle, rotary mixture encoder. Boot mode toggle via master arm switch position at plug-in: HID game controller vs USB mass storage. Neodymium magnet split-throttle detent mechanism. Wire bundle split mid-run into 3 sections to distribute flex fatigue — independently designed solution. Potentiometers connected via jumper wires secured with electrical tape for tool-free modular replacement; replaced 3–4 times since build. PLA filament in black and gray. Enclosure finished with black electrical tape — functional grip benefit under use conditions.</p>
+          </div>
+
+          <div class="img-placeholder">
+            <span>[ Photo — HOTAS Throttle Quadrant — Add Image Here ]</span>
+          </div>
+          <button class="close-btn-bottom" onclick="closeProject('hotas')">— Close —</button>
+
+        </div>
+      </div><!-- end HOTAS -->
+
+
+      <!-- ─────────────── PROJECT RED PHOENIX ─────────────── -->
+      <div class="project-card accent-red fade-in">
+        <div class="project-header" onclick="toggle('phoenix')">
+          <div class="project-title-area">
+            <div class="tag-row">
+              <span class="tag tag-red">Self-Funded</span>
+              <span class="tag tag-red">Aviation</span>
+              <span class="tag tag-red">Age 15–16</span>
+            </div>
+            <div class="project-name">Project Red Phoenix — Rudder Pedals</div>
+            <div class="project-subtitle">This project died twice before a single part was printed. A fraudulent website. A commercial option with the wrong mechanics. Both times, building was the only answer left.</div>
+          </div>
+          <button class="toggle-btn" id="btn-phoenix">Read More ↓</button>
+        </div>
+
+        <div class="project-summary">
+          <p>After finishing the throttle controller, the remaining gap in my simulator setup was rudder pedals — the foot controls that handle aircraft steering and braking. I had been using a workaround on my joystick as a substitute, but it was generating unreliable signals that were causing inconsistent control inputs. For months I had been blaming my own flying for errors that were actually the hardware's fault. I decided it was time to actually solve the problem.</p>
+          <p>The name of this project has a double meaning. RP stands literally for Rudder Pedals — and the name chosen was Red Phoenix, because RP fits both. Red Phoenix — because this project died before it started not once, but twice, and rose from the ashes both times. The name captures exactly how the project unfolded.</p>
+          <button class="read-more-btn" id="btn-phoenix" onclick="toggle('phoenix')">Read More ↓</button>
+        </div>
+
+        <div class="project-body" id="body-phoenix">
+
+          <div class="prose-section">
+            <h4>The First Death — A Fraudulent Website</h4>
+            <p>My original plan was not to build rudder pedals at all. I had just come off six months of intensive work on the throttle controller, and honestly, the idea of immediately starting another full build was not appealing. I decided to simply buy a set this time.</p>
+            <p>I found a website that appeared to be selling flight simulation hardware. They listed a set of rudder pedals for around ₹17,000, which was within a range I was willing to consider. I placed the order. I chose cash on delivery as the payment method — a decision that turned out to be the only thing that protected me from what came next.</p>
+            <p>The pedals never arrived. Days passed. Then weeks. No update, no tracking, no response. Eventually it became clear that the website was fraudulent — a fake storefront with no real product to deliver. Because I had chosen cash on delivery, I had never paid anything. The financial cost to me was zero. The only thing the scam cost me was the time I had spent waiting, hoping, and eventually accepting that nothing was coming.</p>
+            <p>The project was dead before it had started. Then it came back.</p>
+          </div>
+
+          <div class="prose-section">
+            <h4>The Second Death — Wrong Mechanics</h4>
+            <p>After the scam, I started looking at what other options existed. There was one set available for around ₹20,000 from a brand called VKB — a legitimate company that makes flight simulation hardware. Before placing the order this time, I decided to actually research how rudder pedals work on a real aircraft.</p>
+            <p>What I found was important. Real aircraft rudder pedals slide forward and backward. When the pilot pushes the left pedal forward, the aircraft yaws to the left. When the right pedal goes forward, the aircraft yaws right. This is a sliding, linear movement. In addition, each pedal has an independent toe brake — a small section at the top of the pedal that the pilot can press with the front of their foot to activate the brake on that specific wheel. The left toe brake controls the left main gear, the right toe brake controls the right main gear. This independent braking is how pilots steer on the ground, and it is especially critical for older aircraft types where it is the primary means of directional control during taxiing.</p>
+            <p>The VKB set did neither of these things correctly. Instead of sliding forward and backward, the pedals worked by pressing down — more like a car brake pedal than an aircraft rudder. There was also no independent toe braking on each side. For someone who cares deeply about how aircraft actually function, both of these things were disqualifying. I was being asked to pay ₹20,000 for something that was mechanically wrong in two fundamental ways. I rejected it.</p>
+            <p>The project was dead a second time. Then it came back again. The Red Phoenix rose.</p>
+          </div>
+
+          <div class="prose-section">
+            <h4>Building It</h4>
+            <p>With buying ruled out twice — once by fraud and once by inadequate design — building was the only remaining option. I could build my own set with the correct mechanics: proper sliding movement and independent toe braking on each side. And I could do it for less money than either option I had tried to purchase.</p>
+            <p>Unlike the throttle controller, which I had designed entirely from scratch, for the rudder pedals I took a different approach. I found an open-source design that another flight simulation enthusiast had shared publicly and decided to use it as my starting foundation. The decision was deliberate — I was not trying to prove I could design everything from zero. I was trying to get functional pedals as efficiently as possible. Using an existing design as a base and adapting it to my needs was the faster and more sensible path.</p>
+            <p>The main challenge throughout the build was the same printer tolerance issue I had dealt with on the throttle controller — parts consistently coming out slightly smaller than the design specified. With my own designs, I had been able to simply adjust dimensions in the model. With someone else's design, changing one dimension could break the fit of neighbouring parts. So I worked around it physically instead: drilling out holes that were too small, creating alternative mounting solutions where the original approach did not fit, and adapting each component until it worked correctly even where it did not look exactly as the original design had intended.</p>
+          </div>
+
+          <div class="prose-section">
+            <h4>The Finished Result</h4>
+            <p>The finished pedals use metal rails and ball bearings to give each pedal smooth, low-friction movement in the correct direction — sliding forward and backward, exactly as real aircraft rudder pedals do. Each foot has its own independent brake, exactly as real aircraft pedals do. Both things that made the ₹20,000 commercial option unacceptable are present and functional in what I built for significantly less.</p>
+            <p>I completed the final assembly on my sixteenth birthday. The left toe brake currently has a loose wire that needs to be re-soldered — a known pending repair. Everything else is fully operational and has been used regularly since the build was completed.</p>
+          </div>
+
+          <div class="prose-section">
+            <h4>What It Taught Me</h4>
+            <p>The throttle controller had taught me that building from scratch is a viable response when the market fails you. The rudder pedals taught me something equally important: building from scratch is not always the right response. When a solid foundation already exists, the smarter move is often to take it, adapt it, and improve it — rather than spending months reinventing something that someone else has already solved well.</p>
+            <p>That distinction matters in business too. Innovation does not always mean creating something entirely new. Sometimes it means looking at what already exists, identifying exactly where it falls short, and building on top of it to make something better. That is what I did here — and the result was more functional, more affordable, and more correct than anything I could have bought. I intend to keep asking that question: where does something already exist that I can improve, and where does something need to be built from nothing?</p>
+          </div>
+
+          <div class="tech-notes">
+            <div class="tech-notes-label">Technical Notes — For Technical Readers</div>
+            <p>Base design sourced from a paid STL file set (approximately €10) created by a sim hardware enthusiast — covers rudder pedals, joysticks, and yokes. No significant modifications were made to the CAD or STL files themselves — certain components were simply not used where they were not needed. All adaptation was done physically during assembly: drilling new holes where printed dimensions were too small, and finding alternative fastening approaches where the original design did not fit due to printer tolerance issues. Improvised drill: electric hair trimmer with thin blade attachment. 4 metal railings (2 per pedal) with metal ball bearings for low-friction forward-backward sliding axis. Independent differential toe braking on left and right pedals. PLA filament.</p>
+          </div>
+
+          <div class="img-placeholder">
+            <span>[ Photo — Red Phoenix Rudder Pedals — Add Image Here ]</span>
+          </div>
+          <button class="close-btn-bottom" onclick="closeProject('phoenix')">— Close —</button>
+
+        </div>
+      </div><!-- end Red Phoenix -->
+
+
+      <!-- ─────────────── HEAD TRACKING ─────────────── -->
+      <div class="project-card accent-gray fade-in">
+        <div class="project-header">
+          <div class="project-title-area">
+            <div class="tag-row">
+              <span class="tag tag-gray">In Progress</span>
+              <span class="tag tag-gray">Aviation</span>
+              <span class="tag tag-gray">DIY</span>
+            </div>
+            <div class="project-name">DIY Head Tracking</div>
+            <div class="project-subtitle">The final piece of the custom cockpit. Hardware sourced. Build in progress.</div>
+          </div>
+        </div>
+        <div class="project-summary">
+          <p>I am currently building a head-tracking system for my simulator. The concept is straightforward: a small camera watches my head, and wherever I turn to look in the physical world, the view inside the cockpit follows in real time. In a realistic combat simulator, being able to look over your shoulder naturally — instead of pressing a button to pan a camera — changes the experience entirely. It brings a level of spatial awareness that is simply not possible any other way.</p>
+          <p>I am building this using a modified consumer camera that enthusiasts in the simulation community have found works well for this purpose. The hardware is already sourced. The build is in progress. When it is complete, every single piece of hardware in my simulator will have been built by me: the throttle controller, the rudder pedals, and the head tracker. Nothing bought off a shelf, nothing assembled from a kit — each one a custom build, started because something I needed did not exist at a price I was willing to pay.</p>
+        </div>
+      </div><!-- end Head Tracking -->
+
+
+    </div><!-- end projects-list -->
+  </div>
+</div><!-- end projects section -->
+
+
+<!-- ══════════════════════════════════════ ACADEMICS -->
+<section id="academics" style="padding:0;max-width:none">
+  <div class="section-wrap">
+    <div class="section-header fade-in">
+      <span class="section-tag">05</span>
+      <h2 class="section-title">Academics</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="academics-grid">
+
+      <div class="ac-card fade-in">
+        <h3>AP Examinations</h3>
+        <div class="exam-row">
+          <span class="exam-name">AP Calculus AB</span>
+          <span class="exam-badge badge-pending">Awaiting Results</span>
+        </div>
+        <div class="exam-row">
+          <span class="exam-name">AP Calculus BC</span>
+          <span class="exam-badge badge-upcoming">Upcoming</span>
+        </div>
+        <div class="exam-row">
+          <span class="exam-name">AP Computer Science A</span>
+          <span class="exam-badge badge-upcoming">Upcoming</span>
+        </div>
+        <div class="exam-row">
+          <span class="exam-name">AP Business &amp; Personal Finance</span>
+          <span class="exam-badge badge-upcoming">Upcoming</span>
+        </div>
+        <div class="note-row">
+          <p>Pursuing AP examinations independently as part of a self-directed academic path that extends beyond the standard school curriculum.</p>
+        </div>
+      </div>
+
+      <div class="ac-card fade-in">
+        <h3>Standardised Testing</h3>
+        <div class="exam-row">
+          <span class="exam-name">SAT</span>
+          <span class="exam-badge badge-upcoming">Upcoming</span>
+        </div>
+        <div class="exam-row">
+          <span class="exam-name">TOEFL</span>
+          <span class="exam-badge badge-upcoming">Upcoming</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════ FOOTER -->
+<footer>
+  <div class="footer-name">Vishnu Thiagarajan</div>
+  <div class="footer-sub" style="color:var(--text-muted);margin-top:0.7rem;font-style:italic;font-family:'Cormorant Garamond',serif;font-size:0.95rem;letter-spacing:0.05em">
+    Most things I need — I build.
+  </div>
+</footer>
+
+
+<script>
+  function toggle(id) {
+    const body = document.getElementById('body-' + id);
+    const btn  = document.getElementById('btn-'  + id);
+    const isOpen = body.classList.contains('open');
+    if (isOpen) {
+      // Called from top button — scroll back up to btn
+      const btnTop = btn.getBoundingClientRect().top + window.scrollY;
+      const targetScroll = Math.max(0, btnTop - window.innerHeight * 0.6);
+      body.classList.add('closing');
+      btn.textContent = 'Read More ↓';
+      btn.classList.remove('active');
+      window.scrollTo({top: targetScroll, behavior: 'smooth'});
+      setTimeout(() => { body.classList.remove('open', 'closing'); }, 380);
+    } else {
+      body.classList.add('open');
+      btn.textContent = 'Close ↑';
+      btn.classList.add('active');
+      setTimeout(() => {
+        const bodyTop = body.getBoundingClientRect().top + window.scrollY;
+        window.scrollTo({top: bodyTop - 100, behavior: 'smooth'});
+      }, 80);
+    }
+  }
+
+  function closeProject(id) {
+    // Called from bottom close button
+    const body = document.getElementById('body-' + id);
+    const btn  = document.getElementById('btn-'  + id);
+    const bodyHeight = body.offsetHeight; // measure BEFORE collapse
+    const scrollBefore = window.scrollY;
+    body.classList.add('closing');
+    btn.textContent = 'Read More ↓';
+    btn.classList.remove('active');
+    setTimeout(() => {
+      body.classList.remove('open', 'closing');
+      // Instantly compensate for the layout shift so user doesn't move
+      window.scrollTo({top: Math.max(0, scrollBefore - bodyHeight), behavior: 'instant'});
+    }, 380);
+  }
+  function openPoem() {
+    const modal = document.getElementById('poem-modal');
+    const inner = document.getElementById('poem-modal-inner');
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    modal.classList.remove('closing-modal');
+    inner.classList.remove('closing-modal');
+    modal.classList.add('opening');
+    inner.classList.add('opening');
+    setTimeout(() => { modal.classList.remove('opening'); inner.classList.remove('opening'); }, 400);
+  }
+
+  function closePoem(e) {
+    // Called from backdrop click OR directly from close buttons
+    if (e && e.type === 'click' && e.currentTarget === document.getElementById('poem-modal') && e.target !== document.getElementById('poem-modal')) return;
+    const modal = document.getElementById('poem-modal');
+    const inner = document.getElementById('poem-modal-inner');
+    modal.classList.add('closing-modal');
+    inner.classList.add('closing-modal');
+    setTimeout(() => {
+      modal.style.display = 'none';
+      modal.classList.remove('closing-modal');
+      inner.classList.remove('closing-modal');
+      document.body.style.overflow = '';
+    }, 300);
+  }
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
