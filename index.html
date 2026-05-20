@@ -265,6 +265,12 @@
   .fs-dots{display:flex;justify-content:center;gap:0.5rem;padding:0.5rem;background:var(--bg-card);}
   .fs-dot{width:7px;height:7px;border-radius:50%;background:var(--text-muted);cursor:pointer;transition:background 0.2s;}
   .fs-dot.active{background:var(--gold);}
+
+  /* ── Lightbox ───────────────────────────────────── */
+  #fsLightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9999;align-items:center;justify-content:center;cursor:zoom-out;}
+  #fsLightbox.open{display:flex;}
+  #fsLightbox img{max-width:92vw;max-height:92vh;object-fit:contain;border-radius:6px;box-shadow:0 0 60px rgba(0,0,0,0.8);}
+  .fs-slide{cursor:zoom-in;}
 </style>
 </head>
 <body>
@@ -565,7 +571,7 @@
             </div>
             <button class="fs-prev" onclick="fsMove(-1)">&#8592;</button>
             <button class="fs-next" onclick="fsMove(1)">&#8594;</button>
-            <div class="fs-caption" id="fsCaption">Top view — OLED live: Temp 24°C · Hum 21% · Soil 62%</div>
+            <div class="fs-caption" id="fsCaption">Top view — OLED live: Temp 24°C · Hum 71.7% · Soil 62%</div>
             <div class="fs-dots" id="fsDots">
               <span class="fs-dot active" onclick="fsGo(0)"></span>
               <span class="fs-dot" onclick="fsGo(1)"></span>
@@ -878,7 +884,7 @@
 
   // FarmSense Carousel
   var fsIndex = 0;
-  var fsCaptions = ["Top view — OLED live: Temp 24°C · Hum 21% · Soil 62%","Front view — device on, all three readings active","Front view — device on, probe not deployed, Soil: 0%","Front angle — device off, DHT22 sensor visible","Back view — device on","Side view — device on","Angled overview — device off"];
+  var fsCaptions = ["Top view — OLED live: Temp 24°C · Hum 71.7% · Soil 62%","Overhead front view — device on, all three readings active","Front view — device on, probe not deployed, Soil: 0%","Front angle — device off","Back view — device off","Side view — device on","Angled overview — device off"];
   function fsShow(n) {
     var slides = document.querySelectorAll('.fs-slide');
     var dots = document.querySelectorAll('.fs-dot');
@@ -889,6 +895,27 @@
   }
   function fsMove(dir) { fsShow(fsIndex + dir); }
   function fsGo(n) { fsShow(n); }
+  // Wire slide clicks to lightbox
+  document.querySelectorAll('.fs-slide').forEach(function(img){
+    img.addEventListener('click', function(){ openLightbox(this.src); });
+  });
+
+  // Lightbox
+  function openLightbox(src){ 
+    document.getElementById('fsLightboxImg').src = src;
+    document.getElementById('fsLightbox').classList.add('open');
+    document.body.style.overflow='hidden';
+  }
+  function closeLightbox(){
+    document.getElementById('fsLightbox').classList.remove('open');
+    document.body.style.overflow='';
+  }
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeLightbox(); });
 </script>
+
+  <!-- Lightbox -->
+  <div id="fsLightbox" onclick="closeLightbox()">
+    <img id="fsLightboxImg" src="" alt="FarmSense enlarged">
+  </div>
 </body>
 </html>
