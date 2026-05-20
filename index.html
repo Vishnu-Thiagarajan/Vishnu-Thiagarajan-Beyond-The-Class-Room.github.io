@@ -257,7 +257,7 @@
   .fs-slides{width:100%;position:relative;}
   .fs-slide{width:100%;max-height:420px;object-fit:contain;display:none;border-radius:8px;}
   .fs-slide.active{display:block;}
-  .fs-prev,.fs-next{position:absolute;top:45%;transform:translateY(-50%);background:rgba(0,0,0,0.6);border:1px solid var(--gold-border);color:var(--gold);font-size:1.2rem;padding:0.4rem 0.8rem;cursor:pointer;border-radius:4px;z-index:2;transition:background 0.2s;}
+  .fs-prev,.fs-next{position:absolute;top:45%;transform:translateY(-50%);background:rgba(0,0,0,0.82);border:2px solid var(--gold);color:var(--gold);font-size:1.4rem;font-weight:bold;padding:0.5rem 1rem;cursor:pointer;border-radius:6px;z-index:2;transition:background 0.2s;box-shadow:0 2px 12px rgba(0,0,0,0.7);}
   .fs-prev:hover,.fs-next:hover{background:rgba(212,175,90,0.2);}
   .fs-prev{left:0.6rem;}
   .fs-next{right:0.6rem;}
@@ -569,8 +569,8 @@
               <img class="fs-slide" src="images/farmsense-6.jpg" alt="FarmSense photo 6">
               <img class="fs-slide" src="images/farmsense-7.jpg" alt="FarmSense photo 7">
             </div>
-            <button class="fs-prev" onclick="fsMove(-1)">&#8592;</button>
-            <button class="fs-next" onclick="fsMove(1)">&#8594;</button>
+            <button class="fs-prev" onclick="fsMove(-1)" onmousedown="event.stopPropagation()">&#8592;</button>
+            <button class="fs-next" onclick="fsMove(1)" onmousedown="event.stopPropagation()">&#8594;</button>
             <div class="fs-caption" id="fsCaption">Top view — OLED live: Temp 24°C · Hum 71.7% · Soil 62%</div>
             <div class="fs-dots" id="fsDots">
               <span class="fs-dot active" onclick="fsGo(0)"></span>
@@ -681,16 +681,16 @@
           <div class="prose-section">
             <h4>The First Death — A Fraudulent Website</h4>
             <p>My original plan was not to build rudder pedals at all. I had just come off six months of intensive work on the throttle controller, and honestly, the idea of immediately starting another full build was not appealing. I decided to simply buy a set this time.</p>
-            <p>I found a website that appeared to be selling flight simulation hardware. They listed a set of rudder pedals for around ₹17,000, which was within a range I was willing to consider. I placed the order. I chose cash on delivery as the payment method — a decision that turned out to be the only thing that protected me from what came next.</p>
+            <p>I found a website that appeared to be selling flight simulation hardware. The price they listed was within a range I was willing to consider — reasonable enough that I felt comfortable placing the order. I chose cash on delivery as the payment method, a decision that turned out to be the only thing that protected me from what came next.</p>
             <p>The pedals never arrived. Days passed. Then weeks. No update, no tracking, no response. Eventually it became clear that the website was fraudulent — a fake storefront with no real product to deliver. Because I had chosen cash on delivery, I had never paid anything. The financial cost to me was zero. The only thing the scam cost me was the time I had spent waiting, hoping, and eventually accepting that nothing was coming.</p>
             <p>The project was dead before it had started. Then it came back.</p>
           </div>
 
           <div class="prose-section">
             <h4>The Second Death — Wrong Mechanics</h4>
-            <p>After the scam, I started looking at what other options existed. There was one set available for around ₹20,000 from a brand called VKB — a legitimate company that makes flight simulation hardware. Before placing the order this time, I decided to actually research how rudder pedals work on a real aircraft.</p>
+            <p>After the scam, I started looking at what other options existed. There was one commercially available set I came across — a legitimate product from a known manufacturer in the flight simulation space — priced well above what I was prepared to spend. Before making any decision, I took the time to actually research how rudder pedals work on a real aircraft.</p>
             <p>What I found was important. Real aircraft rudder pedals slide forward and backward. When the pilot pushes the left pedal forward, the aircraft yaws to the left. When the right pedal goes forward, the aircraft yaws right. This is a sliding, linear movement. In addition, each pedal has an independent toe brake — a small section at the top of the pedal that the pilot can press with the front of their foot to activate the brake on that specific wheel. The left toe brake controls the left main gear, the right toe brake controls the right main gear. This independent braking is how pilots steer on the ground, and it is especially critical for older aircraft types where it is the primary means of directional control during taxiing.</p>
-            <p>The VKB set did neither of these things correctly. Instead of sliding forward and backward, the pedals worked by pressing down — more like a car brake pedal than an aircraft rudder. There was also no independent toe braking on each side. For someone who cares deeply about how aircraft actually function, both of these things were disqualifying. I was being asked to pay ₹20,000 for something that was mechanically wrong in two fundamental ways. I rejected it.</p>
+            <p>The VKB set did neither of these things correctly. Instead of sliding forward and backward, the pedals worked by pressing down — more like a car brake pedal than an aircraft rudder. There was also no independent toe braking on each side. For someone who cares deeply about how aircraft actually function, both of these things were disqualifying. I was being asked to pay a significant sum for something that was mechanically wrong in two fundamental ways. I rejected it.</p>
             <p>The project was dead a second time. Then it came back again. The Red Phoenix rose.</p>
           </div>
 
@@ -703,7 +703,7 @@
 
           <div class="prose-section">
             <h4>The Finished Result</h4>
-            <p>The finished pedals use metal rails and ball bearings to give each pedal smooth, low-friction movement in the correct direction — sliding forward and backward, exactly as real aircraft rudder pedals do. Each foot has its own independent brake, exactly as real aircraft pedals do. Both things that made the ₹20,000 commercial option unacceptable are present and functional in what I built for significantly less.</p>
+            <p>The finished pedals use metal rails and ball bearings to give each pedal smooth, low-friction movement in the correct direction — sliding forward and backward, exactly as real aircraft rudder pedals do. Each foot has its own independent brake, exactly as real aircraft pedals do. Both things that made the commercial option unacceptable are present and functional in what I built for a fraction of that cost.</p>
             <p>I completed the final assembly on my sixteenth birthday. The left toe brake currently has a loose wire that needs to be re-soldered — a known pending repair. Everything else is fully operational and has been used regularly since the build was completed.</p>
           </div>
 
@@ -897,7 +897,12 @@
   function fsGo(n) { fsShow(n); }
   // Wire slide clicks to lightbox
   document.querySelectorAll('.fs-slide').forEach(function(img){
-    img.addEventListener('click', function(){ openLightbox(this.src); });
+    img.addEventListener('click', function(e){
+      // Only open lightbox on non-touch devices
+      if(window.matchMedia('(hover: hover) and (pointer: fine)').matches){
+        openLightbox(this.src);
+      }
+    });
   });
 
   // Lightbox
