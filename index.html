@@ -251,7 +251,21 @@
       .section-wrap,.section-wrap-dark .section-inner{padding:3rem 1rem}
       .ac-card{padding:1.2rem 1rem}
     }
-  </style>
+  
+  /* ── FarmSense Carousel ─────────────────────────── */
+  .fs-carousel{position:relative;width:100%;margin-top:2rem;border-radius:8px;overflow:hidden;background:#000;}
+  .fs-slides{width:100%;position:relative;}
+  .fs-slide{width:100%;max-height:420px;object-fit:contain;display:none;border-radius:8px;}
+  .fs-slide.active{display:block;}
+  .fs-prev,.fs-next{position:absolute;top:45%;transform:translateY(-50%);background:rgba(0,0,0,0.6);border:1px solid var(--gold-border);color:var(--gold);font-size:1.2rem;padding:0.4rem 0.8rem;cursor:pointer;border-radius:4px;z-index:2;transition:background 0.2s;}
+  .fs-prev:hover,.fs-next:hover{background:rgba(212,175,90,0.2);}
+  .fs-prev{left:0.6rem;}
+  .fs-next{right:0.6rem;}
+  .fs-caption{text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--text-muted);letter-spacing:0.15em;text-transform:uppercase;padding:0.6rem 1rem 0.2rem;background:var(--bg-card);}
+  .fs-dots{display:flex;justify-content:center;gap:0.5rem;padding:0.5rem;background:var(--bg-card);}
+  .fs-dot{width:7px;height:7px;border-radius:50%;background:var(--text-muted);cursor:pointer;transition:background 0.2s;}
+  .fs-dot.active{background:var(--gold);}
+</style>
 </head>
 <body>
 
@@ -443,7 +457,7 @@
     </div>
 
     <!-- Newsletter image -->
-    <img src="poem-newsletter.jpeg" style="width:100%;display:block;margin-bottom:2.5rem;" alt="If Only These Walls Could Talk — published in Jeevana School Newsletter">
+    <img src="images/poem-newsletter.jpeg" style="width:100%;display:block;margin-bottom:2.5rem;" alt="If Only These Walls Could Talk — published in Jeevana School Newsletter">
 
     <!-- Poem text -->
     <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--text);line-height:2.1;">
@@ -539,8 +553,28 @@
             <p>Microcontroller: ESP32 development board. Sensors: DHT22 temperature and humidity sensor, capacitive soil moisture sensor. Display: OLED screen. Power architecture: 6V 180mA solar panel → LM2596S buck converter (regulated to 5V) → TP4056 Li-ion charger module with protection → 18650 Li-ion cell (2200mAh) → MT3608 boost converter (stable 5V output rail) → ESP32 and peripherals. One-directional power path prevents backflow noise and voltage spikes. Trickle-charge behaviour cuts off near 4.2V cell voltage. Deep-discharge protection disconnects load at low cell voltage to preserve cycle life. Total BOM: ₹1,199. Custom cardboard enclosure with decorative leaf graphic.</p>
           </div>
 
-          <div class="img-placeholder">
-            <span>[ Photo — FarmSense Unit &amp; Circuit Diagram — Add Image Here ]</span>
+          <div class="fs-carousel" id="fsCarousel">
+            <div class="fs-slides">
+              <img class="fs-slide active" src="images/farmsense-1.jpg" alt="FarmSense photo 1">
+              <img class="fs-slide" src="images/farmsense-2.jpg" alt="FarmSense photo 2">
+              <img class="fs-slide" src="images/farmsense-3.jpg" alt="FarmSense photo 3">
+              <img class="fs-slide" src="images/farmsense-4.jpg" alt="FarmSense photo 4">
+              <img class="fs-slide" src="images/farmsense-5.jpg" alt="FarmSense photo 5">
+              <img class="fs-slide" src="images/farmsense-6.jpg" alt="FarmSense photo 6">
+              <img class="fs-slide" src="images/farmsense-7.jpg" alt="FarmSense photo 7">
+            </div>
+            <button class="fs-prev" onclick="fsMove(-1)">&#8592;</button>
+            <button class="fs-next" onclick="fsMove(1)">&#8594;</button>
+            <div class="fs-caption" id="fsCaption">Top view — OLED live readings with soil probe in soil (62% moisture)</div>
+            <div class="fs-dots" id="fsDots">
+              <span class="fs-dot active" onclick="fsGo(0)"></span>
+              <span class="fs-dot" onclick="fsGo(1)"></span>
+              <span class="fs-dot" onclick="fsGo(2)"></span>
+              <span class="fs-dot" onclick="fsGo(3)"></span>
+              <span class="fs-dot" onclick="fsGo(4)"></span>
+              <span class="fs-dot" onclick="fsGo(5)"></span>
+              <span class="fs-dot" onclick="fsGo(6)"></span>
+            </div>
           </div>
           <button class="close-btn-bottom" onclick="closeProject('farm')">— Close —</button>
 
@@ -841,6 +875,20 @@
     entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
   }, { threshold: 0.08 });
   document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+
+  // FarmSense Carousel
+  var fsIndex = 0;
+  var fsCaptions = ["Top view — OLED live readings with soil probe in soil (62% moisture)","Front view — device running, all three readings active","Front view — soil probe deployed in pot, Soil: 62%","Side angle — DHT22 temperature & humidity sensor visible","Side view — device on, OLED readable at angle","Angled overview — device off, full form factor","Angled overview — device off, soil probe visible"];
+  function fsShow(n) {
+    var slides = document.querySelectorAll('.fs-slide');
+    var dots = document.querySelectorAll('.fs-dot');
+    fsIndex = (n + slides.length) % slides.length;
+    slides.forEach(function(s,i){ s.classList.toggle('active', i===fsIndex); });
+    dots.forEach(function(d,i){ d.classList.toggle('active', i===fsIndex); });
+    document.getElementById('fsCaption').textContent = fsCaptions[fsIndex];
+  }
+  function fsMove(dir) { fsShow(fsIndex + dir); }
+  function fsGo(n) { fsShow(n); }
 </script>
 </body>
 </html>
