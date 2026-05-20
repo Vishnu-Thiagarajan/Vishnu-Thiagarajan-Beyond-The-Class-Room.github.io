@@ -565,7 +565,7 @@
             </div>
             <button class="fs-prev" onclick="fsMove(-1)">&#8592;</button>
             <button class="fs-next" onclick="fsMove(1)">&#8594;</button>
-            <div class="fs-caption" id="fsCaption">Top view — OLED live readings with soil probe in soil (62% moisture)</div>
+            <div class="fs-caption" id="fsCaption">Top view — OLED live: Temp 24°C · Hum 21% · Soil 62%</div>
             <div class="fs-dots" id="fsDots">
               <span class="fs-dot active" onclick="fsGo(0)"></span>
               <span class="fs-dot" onclick="fsGo(1)"></span>
@@ -878,7 +878,7 @@
 
   // FarmSense Carousel
   var fsIndex = 0;
-  var fsCaptions = ["Top view — OLED live readings with soil probe in soil (62% moisture)","Front view — device running, all three readings active","Front view — soil probe deployed in pot, Soil: 62%","Side angle — DHT22 temperature & humidity sensor visible","Side view — device on, OLED readable at angle","Angled overview — device off, full form factor","Angled overview — device off, soil probe visible"];
+  var fsCaptions = ["Top view — OLED live: Temp 24°C · Hum 21% · Soil 62%","Front view — device on, all three readings active","Front view — device on, probe not deployed, Soil: 0%","Front angle — device off, DHT22 sensor visible","Back view — device on","Side view — device on","Angled overview — device off"];
   function fsShow(n) {
     var slides = document.querySelectorAll('.fs-slide');
     var dots = document.querySelectorAll('.fs-dot');
