@@ -254,8 +254,8 @@
   
   /* ── FarmSense Carousel ─────────────────────────── */
   .fs-carousel{position:relative;width:100%;margin-top:2rem;border-radius:8px;overflow:hidden;background:#000;}
-  .fs-slides{width:100%;position:relative;}
-  .fs-slide{width:100%;max-height:420px;object-fit:contain;display:none;border-radius:8px;}
+  .fs-slides{width:100%;position:relative;height:420px;}  @media(max-width:600px){.fs-slides{height:260px;}}
+  .fs-slide{width:100%;height:100%;object-fit:contain;display:none;border-radius:8px;background:#000;}
   .fs-slide.active{display:block;}
   .fs-prev,.fs-next{position:absolute;top:45%;transform:translateY(-50%);background:rgba(0,0,0,0.82);border:2px solid var(--gold);color:var(--gold);font-size:1.4rem;font-weight:bold;padding:0.5rem 1rem;cursor:pointer;border-radius:6px;z-index:2;transition:background 0.2s;box-shadow:0 2px 12px rgba(0,0,0,0.7);}
   .fs-prev:hover,.fs-next:hover{background:rgba(212,175,90,0.2);}
@@ -271,6 +271,19 @@
   #fsLightbox.open{display:flex;}
   #fsLightbox img{max-width:92vw;max-height:92vh;object-fit:contain;border-radius:6px;box-shadow:0 0 60px rgba(0,0,0,0.8);}
   .fs-slide{cursor:zoom-in;}
+
+  /* ── Collapsible Tech Notes ─────────────────────── */
+  .tech-notes .tech-notes-label{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0.5rem 0.75rem;margin:-0.2rem -0.4rem 0;
+    border:1px solid rgba(212,175,90,0.3);border-radius:4px;
+    background:rgba(212,175,90,0.06);
+    transition:background 0.2s;
+  }
+  .tech-notes .tech-notes-label:hover{background:rgba(212,175,90,0.12);}
+  .tn-toggle-hint{font-family:'JetBrains Mono',monospace;font-size:0.58rem;color:var(--gold);letter-spacing:0.1em;opacity:0.8;}
+  .tn-arrow{font-size:0.75rem;color:var(--gold);transition:transform 0.25s;display:inline-block;margin-left:0.5rem;}
+  .tn-body{overflow:hidden;margin-top:0.75rem;}
 </style>
 </head>
 <body>
@@ -555,8 +568,11 @@
           </div>
 
           <div class="tech-notes">
-            <div class="tech-notes-label">Technical Notes — For Technical Readers</div>
-            <p>Microcontroller: ESP32 development board. Sensors: DHT22 temperature and humidity sensor, capacitive soil moisture sensor. Display: OLED screen. Power architecture: 6V 180mA solar panel → LM2596S buck converter (regulated to 5V) → TP4056 Li-ion charger module with protection → 18650 Li-ion cell (2200mAh) → MT3608 boost converter (stable 5V output rail) → ESP32 and peripherals. One-directional power path prevents backflow noise and voltage spikes. Trickle-charge behaviour cuts off near 4.2V cell voltage. Deep-discharge protection disconnects load at low cell voltage to preserve cycle life. Total BOM: ₹1,199. Custom cardboard enclosure with decorative leaf graphic.</p>
+            <div class="tech-notes-label" onclick="toggleTechNotes(this)" style="cursor:pointer;">Technical Notes — For Technical Readers <span class="tn-toggle-hint">[ tap to expand ]</span><span class="tn-arrow">▸</span></div>
+            <div class="tn-body" style="display:none;">
+              <p>FarmSense is built around an ESP32 microcontroller, which reads from a DHT22 sensor for ambient temperature and relative humidity, and a capacitive probe for soil moisture. All three values are displayed continuously on an OLED screen.</p>
+              <p>The power system is structured as a four-stage chain. A 6V 180mA solar panel feeds an LM2596S buck converter, which steps the input down to a regulated 5V. This output drives a TP4056 lithium-ion charging module, which manages charge delivery to an 18650 cell rated at 2200mAh. The TP4056 enforces an upper charge cutoff at approximately 4.2V and disconnects the load under low-voltage conditions to prevent deep discharge. Downstream of the cell, an MT3608 boost converter produces a stable 5V rail for the ESP32 and all peripherals. Structuring the chain this way keeps each stage isolated, preventing voltage noise from one stage from affecting another. Total component cost was ₹1,199. The enclosure is custom cardboard with a hand-drawn leaf graphic on the top panel.</p>
+            </div>
           </div>
 
           <div class="fs-carousel" id="fsCarousel">
@@ -642,8 +658,12 @@
           </div>
 
           <div class="tech-notes">
-            <div class="tech-notes-label">Technical Notes — For Technical Readers</div>
-            <p>Microcontroller: Raspberry Pi Pico running CircuitPython. Inputs: 2 sliding potentiometers (independent split-throttle axes), 6 push buttons on base panel, 1 push button and 1 ministick with indent on right handle, 2-way and 3-way toggle switches, LED master arm toggle, rotary mixture encoder. Boot mode toggle via master arm switch position at plug-in: HID game controller vs USB mass storage. Neodymium magnet split-throttle detent mechanism. Wire bundle split mid-run into 3 sections to distribute flex fatigue — independently designed solution. Potentiometers connected via jumper wires secured with electrical tape for tool-free modular replacement; replaced 3–4 times since build. PLA filament in black and gray. Enclosure finished with black electrical tape — functional grip benefit under use conditions.</p>
+            <div class="tech-notes-label" onclick="toggleTechNotes(this)" style="cursor:pointer;">Technical Notes — For Technical Readers <span class="tn-toggle-hint">[ tap to expand ]</span><span class="tn-arrow">▸</span></div>
+            <div class="tn-body" style="display:none;">
+              <p>The controller is built around a Raspberry Pi Pico running MicroPython, presenting to the host PC as a USB HID joystick device. Analog inputs are handled by an MCP3008 eight-channel SPI analog-to-digital converter. The left and right throttle sliders connect to channels 3 and 4 respectively, a rotary potentiometer to channel 2, and the thumbstick TDC slew axis to channel 6. The SPI bus runs on GP10 through GP13.</p>
+              <p>Digital switch inputs are managed through a PCF8575 sixteen-bit I²C GPIO expander, which allows all toggle switches to share a two-wire bus rather than consuming individual GPIO pins. Each three-position ON-OFF-ON toggle is wired with its common terminal to ground and its UP and DOWN terminals to separate PCF pins. When centered, both pins are held high by the internal pull-ups. Moving the switch in either direction pulls the corresponding pin low. The firmware reads the full sixteen-bit register over I²C and extracts each switch state by isolating the relevant bits. Make-before-break contact behavior during switching is handled by a state machine that holds the last valid state through any transient condition. The I²C bus runs on GP4 and GP5.</p>
+              <p>Additional inputs connect directly to Pico GPIO: the illuminated Master Arm switch on GP2, a three-way flap selector across GP3 and GP6, four toggle switches, six push buttons, and the thumbstick push-click on GP21. The split-throttle detent is implemented with a pair of neodymium magnets. Boot mode is determined by Master Arm switch position at power-on: when the switch is raised (on, high state), the device boots into USB mass storage mode for firmware access; when the switch is lowered (off, low state), it initialises as a normal HID joystick device.</p>
+            </div>
           </div>
 
           <div class="img-placeholder">
@@ -714,8 +734,11 @@
           </div>
 
           <div class="tech-notes">
-            <div class="tech-notes-label">Technical Notes — For Technical Readers</div>
-            <p>Base design sourced from a paid STL file set (approximately €10) created by a sim hardware enthusiast — covers rudder pedals, joysticks, and yokes. No significant modifications were made to the CAD or STL files themselves — certain components were simply not used where they were not needed. All adaptation was done physically during assembly: drilling new holes where printed dimensions were too small, and finding alternative fastening approaches where the original design did not fit due to printer tolerance issues. Improvised drill: electric hair trimmer with thin blade attachment. 4 metal railings (2 per pedal) with metal ball bearings for low-friction forward-backward sliding axis. Independent differential toe braking on left and right pedals. PLA filament.</p>
+            <div class="tech-notes-label" onclick="toggleTechNotes(this)" style="cursor:pointer;">Technical Notes — For Technical Readers <span class="tn-toggle-hint">[ tap to expand ]</span><span class="tn-arrow">▸</span></div>
+            <div class="tn-body" style="display:none;">
+              <p>The pedal geometry is based on a commercially available paid STL file set designed for flight simulation peripherals. The CAD files were used as provided without modification. All physical adaptation was performed during assembly: where printed tolerances were too tight, holes were drilled to achieve the correct clearance, and alternative fastening methods were used where the original design called for hardware that did not fit. The drill used for this purpose was an electric hair trimmer with a thin blade attachment.</p>
+              <p>Each pedal rides on two metal railings with metal ball bearings, providing smooth low-friction travel along the forward-backward axis consistent with how rudder pedals function on a real aircraft. Each pedal has its own independent toe brake, enabling differential braking on left and right sides independently. The filament used throughout is PLA.</p>
+            </div>
           </div>
 
           <div class="img-placeholder">
@@ -916,6 +939,18 @@
     document.body.style.overflow='';
   }
   document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeLightbox(); });
+
+  function toggleTechNotes(label) {
+    var body = label.nextElementSibling;
+    var arrow = label.querySelector('.tn-arrow');
+    if (body.style.display === 'none') {
+      body.style.display = 'block';
+      arrow.style.transform = 'rotate(90deg)';
+    } else {
+      body.style.display = 'none';
+      arrow.style.transform = 'rotate(0deg)';
+    }
+  }
 </script>
 
   <!-- Lightbox -->
