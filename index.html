@@ -105,7 +105,8 @@
       --white:#F0EDE6;
     }
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-    html{scroll-behavior:smooth}
+    html{scroll-behavior:smooth;overscroll-behavior-x:none}
+    body{overscroll-behavior-x:none}
     body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;overflow-x:hidden}
 
     /* ── NAV ── */
@@ -197,7 +198,8 @@
     /* tech notes box */
     .tech-notes{margin-top:2.8rem;padding:1.4rem 1.6rem;background:var(--bg-surface);border:1px solid rgba(122,120,112,0.25);border-left:2px solid var(--text-muted)}
     .tech-notes-label{font-family:'JetBrains Mono',monospace;font-size:0.54rem;color:var(--text-muted);letter-spacing:0.24em;text-transform:uppercase;margin-bottom:0.75rem}
-    .tech-notes p{font-size:0.81rem;color:var(--text-muted);line-height:1.8}
+    .tech-notes p{font-size:0.81rem;color:var(--text-muted);line-height:1.8;margin-bottom:1.05rem}
+    .tech-notes p:last-child{margin-bottom:0}
 
     .img-placeholder{width:100%;height:190px;margin-top:2rem;background:var(--bg-surface);border:1px dashed var(--gold-border);display:flex;align-items:center;justify-content:center}
     .img-placeholder span{font-family:'JetBrains Mono',monospace;font-size:0.58rem;color:var(--text-muted);letter-spacing:0.2em;text-transform:uppercase}
@@ -279,13 +281,28 @@
   /* Lightbox */
   #fsLightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9999;align-items:center;justify-content:center;cursor:zoom-out;}
   #fsLightbox.open{display:flex;}
-  #fsLightbox img{max-width:92vw;max-height:92vh;object-fit:contain;border-radius:6px;}
+  #fsLightbox img{max-width:88vw;max-height:84vh;object-fit:contain;border-radius:6px;}
+  #lbPrev,#lbNext{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.82);border:2px solid var(--gold);color:var(--gold);font-size:1.4rem;font-weight:bold;padding:0.5rem 1rem;cursor:pointer;border-radius:6px;z-index:2;box-shadow:0 2px 12px rgba(0,0,0,0.7);display:none;}
+  #lbPrev:hover,#lbNext:hover{background:rgba(212,175,90,0.2);}
+  #lbPrev{left:1rem;} #lbNext{right:1rem;}
+  #lbClose{position:absolute;top:1rem;right:1rem;background:rgba(0,0,0,0.82);border:2px solid var(--gold);color:var(--gold);font-size:1.1rem;line-height:1;padding:0.55rem 0.8rem;cursor:pointer;border-radius:6px;z-index:3;box-shadow:0 2px 12px rgba(0,0,0,0.7);}
+  #lbClose:hover{background:var(--gold);color:#080C10;}
+  #lbHint{position:absolute;top:1.15rem;left:1rem;font-family:'JetBrains Mono',monospace;font-size:0.55rem;color:var(--text-muted);letter-spacing:0.16em;text-transform:uppercase;}
+  #fsLightbox.gallery #lbPrev,#fsLightbox.gallery #lbNext{display:block;}
+  #lbCaption{position:absolute;bottom:1.5rem;left:0;right:0;text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--text-muted);letter-spacing:0.18em;text-transform:uppercase;padding:0 1rem;display:none;}
+  #fsLightbox.gallery #lbCaption{display:block;}
+  @media(max-width:600px){#lbPrev,#lbNext{padding:0.4rem 0.7rem;font-size:1.1rem;} #lbPrev{left:0.4rem;} #lbNext{right:0.4rem;}}
   /* Tech notes */
   .tech-notes .tech-notes-label{display:flex;align-items:center;justify-content:space-between;padding:0.5rem 0.75rem;margin:-0.2rem -0.4rem 0;border:1px solid rgba(212,175,90,0.3);border-radius:4px;background:rgba(212,175,90,0.06);cursor:pointer;}
   .tech-notes .tech-notes-label:hover{background:rgba(212,175,90,0.12);}
   .tn-toggle-hint{font-family:'JetBrains Mono',monospace;font-size:0.58rem;color:var(--gold);letter-spacing:0.1em;opacity:0.8;}
   .tn-arrow{font-size:0.75rem;color:var(--gold);transition:transform 0.25s;display:inline-block;margin-left:0.5rem;}
   .tn-body{overflow:hidden;margin-top:0.75rem;}
+  /* ── About collapse ─────────────────────────────── */
+  .about-more{display:none;}
+  .about-more.open{display:block;animation:slideDown 0.45s ease forwards;}
+  .about-more.closing{display:block;animation:slideUp 0.35s ease forwards;}
+  #aboutMoreBtn{margin-top:1.6rem;}
 </style>
 </head>
 <body>
@@ -309,7 +326,7 @@
   <div class="hero-tag">Beyond The Classroom</div>
   <h1 class="hero-name">Vishnu<br><span>Thiagarajan</span></h1>
   <div class="hero-divider"></div>
-  <p class="hero-tagline">Innovator &nbsp;·&nbsp; Thinker &nbsp;·&nbsp; Creator</p>
+  <p class="hero-tagline">Always Up For A Challenge</p>
   <div class="hero-stats">
     <div class="hero-stat">
       <div class="hero-stat-num">Published</div>
@@ -346,19 +363,20 @@
         <div class="about-grid">
 
       <div class="about-text fade-in">
-        <p>I am Vishnu, and most of what I do comes down to one thing: <strong style="color:var(--gold);">I am always up for a challenge.</strong> I like putting myself in front of something I have not done before and finding out whether I can figure it out. Almost everything that follows started that way.</p>
+        <p>I am Vishnu. Most of what I do starts the same way: something I have not done before turns up, and <strong style="color:var(--gold);">I want to know whether I can do it.</strong> That is why I build my own flight simulator controls, why I argue cases in front of debate judges, and why I lose a great many evenings to a chessboard.</p>
 
-        <p>Aviation came first. My father holds a private pilot licence, and I grew up around it. There is something about a plane soaring in the limitless expanse of the sky that has never stopped being extraordinary to me. It is what pulled me into flight simulation, and specifically into fast jets. What I love about them is the pace. Everything happens quickly, the turns are tight, the aircraft strains against them, and a decision made half a second too late is the difference between flying well and not flying at all.</p>
-
-        <p>It is also what got me building. Every piece of cockpit hardware I wanted was either overpriced or did not exist, <strong style="color:var(--gold);">so I decided to make it myself.</strong> That is where the throttle quadrant and the rudder pedals came from. Building them was really just an extension of something I have always done anyway. I like opening things up, figuring out how they function, and understanding why the people who designed them made the choices they did. An unfortunate incident involving my PS5 controller once gave me an excuse to strip it down completely, and I spent far longer than necessary studying the conductive silicone under the buttons and how Sony built the haptics and the adaptive triggers.</p>
-
-        <p>On the academic side, economics is the subject I enjoy the most. Samuelson described it as <em style="color:var(--text);font-style:italic;">the study of how societies employ scarce productive resources that have alternative uses, and how they distribute what is produced for consumption now and in the future.</em> I find that idea fascinating. Management interests me for much the same reason, because both subjects come down to making good decisions when resources are limited. That way of thinking has become a habit for me.</p>
-
-        <p>Chess is where I go to think. I like the way it hands you command of an entire army, and how one move can take you from a winning position to a losing one. In a recent game I was completely winning, and then I misclicked, left my queen where a rook could take it, and lost the whole thing. <strong style="color:var(--gold);">One careless moment undid an entire game,</strong> and I think life works in much the same way.</p>
-
-        <p>I also do not give up easily, and I mean that well beyond the chessboard. If I am facing a forced checkmate in five moves, I will play all five moves, because <strong style="color:var(--gold);">five moves are five opportunities for my opponent to make a mistake.</strong> I approach life in the same way. However poor the position looks, there is usually a way forward, and I would rather find it than walk away from it.</p>
+        <p>I do not give up easily, and I mean that well beyond the chessboard. If I am facing a forced checkmate in five moves, I will play all five moves, because <strong style="color:var(--gold);">five moves are five opportunities for my opponent to make a mistake.</strong> I approach life in the same way. However poor the position looks, there is usually a way forward, and I would rather find it than walk away from it.</p>
 
         <p>I enjoy public speaking. Standing in front of a crowd gives me a rush of adrenaline that I have never grown tired of, which is probably why debating took hold as quickly as it did. I am also not someone who stays quiet when I believe something is wrong. <strong style="color:var(--gold);">I would rather say it than let it pass,</strong> and I try to be direct without being unkind.</p>
+
+        <div class="about-more" id="aboutMore">
+        <p>Chess is where I go to think. I like the way it hands you command of an entire army, and how one move can take you from a winning position to a losing one. In a recent game I was completely winning, and then I misclicked, left my queen where a rook could take it, and lost the whole thing. <strong style="color:var(--gold);">One careless moment undid an entire game,</strong> and I think life works in much the same way.</p>
+
+        <p>My father holds a private pilot licence, but my own route into aviation started with a joystick he bought me. I still remember pulling it back for the first time and watching a virtual aircraft climb into the sky. That feeling never left me. It is what pulled me into flight simulation, and specifically into fast jets. What I love about them is the pace. Everything happens quickly, the turns are tight, the aircraft strains against them, and a decision made half a second too late is the difference between flying well and not flying at all.</p>
+
+        <p>Aviation is also what got me building. Every piece of simulator hardware I wanted was either overpriced or did not exist, so <strong style="color:var(--gold);">I decided to make it myself.</strong> Both of the flight control sets further down this page came out of that. Building them was really just an extension of something I have always done anyway. I like opening things up, tracing how they work, and understanding why the people who designed them made the choices they did. An unfortunate incident involving my PS5 controller once gave me an excuse to strip it down completely, and I spent far longer than necessary studying the conductive silicone under the buttons and how Sony built the haptics and the adaptive triggers.</p>
+
+        <p>On the academic side, economics is the subject I enjoy the most. Samuelson described it as <em style="color:var(--text);font-style:italic;">the study of how societies employ scarce productive resources that have alternative uses, and how they distribute what is produced for consumption now and in the future.</em> I find that idea fascinating. Management interests me for much the same reason, because both subjects come down to making good decisions when resources are limited. That way of thinking has become a habit for me.</p>
 
         <p>Away from all of that, I solve Rubik's cubes and set myself speedcubing challenges. My favourite is a cube I found in Malaysia that reveals its colours for only a second at a time and asks you to solve it from memory before sixty seconds run out. I also play video games whenever I have the time for them, and Uncharted 4, Prince of Persia: The Lost Crown, God of War and Horizon are some of my favourites. I do most of my reading on a Kobo Libra Colour e-reader that I got for my birthday, and Gordon Korman's <em>On the Run</em> series is among the books I have enjoyed the most. Most of my listening is devotional, particularly a five-part Ramayana playlist that I come back to constantly. Supervising all of it from the nearest sofa is Leo, our ten-year-old beagle-lab mix.</p>
 
@@ -366,12 +384,15 @@
           <img src="images/leo.jpg" alt="Leo, a beagle-lab mix" style="width:100%;border-radius:8px;border:1px solid var(--gold-border);display:block;">
           <figcaption style="font-family:'JetBrains Mono',monospace;font-size:0.58rem;color:var(--text-muted);letter-spacing:0.18em;text-transform:uppercase;text-align:center;padding-top:0.7rem;">Leo &nbsp;·&nbsp; Chief Supervising Officer &nbsp;·&nbsp; Ten Years of Service</figcaption>
         </figure>
+        </div>
+        <button class="read-more-btn" id="aboutMoreBtn" onclick="toggleAbout()" style="background:var(--gold);border-color:var(--gold);color:#0D1117;font-weight:600;">Read More About Me ↓</button>
       </div>
 
       <div class="detail-rows fade-in">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:0.58rem;color:var(--gold);letter-spacing:0.25em;text-transform:uppercase;padding-bottom:0.9rem;">Quick Facts</div>
         <div class="detail-row">
           <span class="detail-label">School</span>
-          <span class="detail-value">Jeevana School</span>
+          <span class="detail-value">Jeevana School &nbsp;·&nbsp; Madurai, India</span>
         </div>
         <div class="detail-row">
           <span class="detail-label">Role</span>
@@ -383,7 +404,7 @@
         </div>
         <div class="detail-row">
           <span class="detail-label">Interests</span>
-          <span class="detail-value">Aviation, Debate, Chess, Tinkering, 3D Printing</span>
+          <span class="detail-value">Aviation, Debate, Chess, Cubing, Electronics, 3D Printing</span>
         </div>
       </div>
 
@@ -444,7 +465,6 @@
 
     <div style="display:flex;flex-direction:column;gap:1.2rem;max-width:680px;">
 
-
       <!-- Prefect -->
       <div class="project-card accent-gold fade-in">
         <div style="padding:1.75rem 2rem;">
@@ -485,22 +505,6 @@
         </div>
       </div>
 
-      <!-- Computer Fair -->
-      <div class="project-card accent-blue fade-in" style="cursor:pointer;" onclick="document.getElementById('projects').scrollIntoView({behavior:'smooth',block:'start'})">
-        <div style="padding:1.75rem 2rem;">
-          <div class="tag-row">
-            <span class="tag tag-gold">🏆 1st Place</span>
-            <span class="tag tag-blue">School Computer Fair</span>
-          </div>
-          <div class="project-name" style="font-size:1.25rem;margin-bottom:0.4rem;">Project FarmSense</div>
-          <p style="font-size:0.86rem;color:var(--text);line-height:1.8;margin-bottom:1.1rem;">Our team's solar-powered plant monitoring station won first place at the school computer fair. Built for ₹1,199 with no mains power and no internet dependency.</p>
-          <div style="display:flex;gap:0.6rem;margin-top:0.4rem;">
-            <button style="padding:0.75rem 1rem;font-family:'JetBrains Mono',monospace;font-size:0.62rem;letter-spacing:0.15em;text-transform:uppercase;color:#fff;background:var(--blue);border:none;cursor:pointer;flex:1;font-weight:600;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">View Project</button>
-            <button style="padding:0.75rem 1rem;font-family:'JetBrains Mono',monospace;font-size:0.62rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--blue);background:transparent;border:1px solid var(--blue);cursor:pointer;flex:1;font-weight:600;transition:background 0.2s;" onclick="event.stopPropagation();openLightbox('images/farmsense-certificate.jpg')">View Certificate</button>
-          </div>
-        </div>
-      </div>
-
       <!-- English Ambassador -->
       <div class="project-card accent-gold fade-in">
         <div style="padding:1.75rem 2rem;">
@@ -511,6 +515,22 @@
           <div class="project-name" style="font-size:1.25rem;margin-bottom:0.4rem;">English Ambassador</div>
           <p style="font-size:0.86rem;color:var(--text);line-height:1.8;margin-bottom:1.1rem;">Awarded the Spoken English Excellence badge — English Ambassador — for consistent English communication, one of a small number awarded across the senior year.</p>
           <button style="margin-top:0.4rem;padding:0.75rem 1.6rem;font-family:'JetBrains Mono',monospace;font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;color:#080C10;background:var(--gold);border:none;cursor:pointer;width:100%;font-weight:600;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'" onclick="openLightbox('images/english-ambassador-badge.jpg')">View Badge</button>
+        </div>
+      </div>
+
+      <!-- Computer Fair -->
+      <div class="project-card accent-blue fade-in" style="cursor:pointer;" onclick="document.getElementById('projects').scrollIntoView({behavior:'smooth',block:'start'})">
+        <div style="padding:1.75rem 2rem;">
+          <div class="tag-row">
+            <span class="tag tag-gold">🏆 1st Place</span>
+            <span class="tag tag-blue">School Computer Fair</span>
+          </div>
+          <div class="project-name" style="font-size:1.25rem;margin-bottom:0.4rem;">Project FarmSense</div>
+          <p style="font-size:0.86rem;color:var(--text);line-height:1.8;margin-bottom:1.1rem;">A solar-powered soil and weather monitor built by a team of three. It runs with no mains power, no internet connection, and no running cost.</p>
+          <div style="display:flex;gap:0.6rem;margin-top:0.4rem;">
+            <button style="padding:0.75rem 1rem;font-family:'JetBrains Mono',monospace;font-size:0.62rem;letter-spacing:0.15em;text-transform:uppercase;color:#fff;background:var(--blue);border:none;cursor:pointer;flex:1;font-weight:600;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">View Project</button>
+            <button style="padding:0.75rem 1rem;font-family:'JetBrains Mono',monospace;font-size:0.62rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--blue);background:transparent;border:1px solid var(--blue);cursor:pointer;flex:1;font-weight:600;transition:background 0.2s;" onclick="event.stopPropagation();openLightbox('images/farmsense-certificate.jpg')">View Certificate</button>
+          </div>
         </div>
       </div>
 
@@ -591,8 +611,8 @@
         </div>
 
         <div class="project-summary">
-          <p>When our school assigned a computer fair project, most teams built something safe and familiar. My team and I wanted to do something different — we wanted to build something that would actually be useful to a real person in a real situation, something that solved a genuine problem rather than just demonstrating a technical capability.</p>
-          <p>The question we started with was this: how do you give a farmer or a gardener useful, live information about their soil and their environment, without asking them to install a power cable, connect to the internet, or pay anything to keep it running? The answer was FarmSense. Our team built a device that reads moisture in the soil, air temperature, and humidity, displays all three live on a small screen, runs entirely on a solar panel, and costs nothing to operate after the initial setup. Total build cost across all components: ₹1,199. The team won first place at the school computer fair.</p>
+          <p>Most teams at the computer fair built something safe. We wanted to build something a person could actually use, rather than a demonstration that we knew how to wire up a sensor.</p>
+          <p>The question we started with was this: how do you give a farmer or a gardener useful, live information about their soil and their environment, without asking them to install a power cable, connect to the internet, or pay anything to keep it running? The answer was FarmSense. Our team built a device that reads moisture in the soil, air temperature, and humidity, displays all three live on a small screen, runs entirely on a solar panel, and costs nothing to operate after the initial setup.</p>
         </div>
 <div class="fs-carousel">
             <div class="fs-slides">
@@ -622,33 +642,38 @@
 
           <div class="prose-section">
             <h4>The Team</h4>
-            <p>FarmSense was built with two classmates — Deepan Kishore and Ajay Krishna. Deepan took on parts of the sensor code, and Ajay contributed to the research and early planning phase. I handled the power system design, the final integration of all components, the soldering, and resolving a software conflict that was preventing the display from showing data. But what I remember most is not the division of tasks — it is the fact that we were genuinely aligned on what we were trying to make. When a team agrees on the goal from the very beginning, the work finds its own shape. That alignment is what took a school assignment and turned it into something that actually won.</p>
+            <p>FarmSense was built with two classmates, Deepan Kishore and Ajay Krishna. Our first idea was something far more ambitious, and we spent a while on it before working out that the parts alone would have gone well past the ₹2,000 budget the competition allowed. I already owned one of the expensive components and could have used it to get us under the limit on paper, but that would have meant competing against everyone else on an uneven footing, so we dropped the idea and started again.</p>
+            <p>Once we had settled on FarmSense I took the technical direction, worked out what we needed and how it would fit together, and split the work from there. Deepan wrote a good part of the sensor code, Ajay handled the research and planning, and I built the power system, did the soldering and assembled the final unit.</p>
+            <p>Close to the deadline the display stopped showing anything at all. We assumed a wire had failed somewhere and pulled things apart looking for it, but it turned out to be a software conflict instead. Sorting that out was the last thing standing between us and a device that worked.</p>
           </div>
 
           <div class="prose-section">
             <h4>The Thinking Behind It</h4>
-            <p>The three constraints the team set from the beginning were non-negotiable: no mains power, no internet connection, no ongoing cost. Everything else in the design flowed from those three requirements. We did not start with what would be easy to build and work toward something useful. We started with what would be genuinely useful and worked backward to figure out how to build it.</p>
-            <p>Setting constraints first changes what you end up making. Starting from what was convenient would have produced something that plugged into a wall and sent data to a phone app — the kind of thing dozens of commercial products already do. Starting from "no power cable, no internet, no cost" forced a completely different approach and produced something that can work in a field far from any infrastructure, indefinitely, without anyone needing to manage it.</p>
+            <p>We agreed on three rules before designing anything: no mains power, no internet, no running cost. Everything else had to fit around those.</p>
+            <p>It would have been far easier to build the other kind of device, the one that plugs into a wall and pushes readings to a phone app. Plenty of those already exist and most are better than anything we could have made. Building to the three rules instead meant the thing had to survive on its own in a field with nobody looking after it, which is harder and, I think, more useful.</p>
           </div>
 
           <div class="prose-section">
             <h4>What the Device Does</h4>
             <p>FarmSense is a compact, self-contained unit. It has a sensor you push into the soil, which measures how much moisture is present. It also reads the air temperature and the relative humidity of the surrounding environment. All three of these readings are shown live on a small screen attached to the unit. The readings update continuously.</p>
             <p>The device is powered by a small solar panel. During the day, the solar panel generates electricity and stores the surplus in a rechargeable battery inside the unit. At night, or on cloudy days, the device draws from that stored energy and keeps running. The battery system is protected in both directions — it will not be overcharged when there is excess solar power, and it will not be drained to the point of permanent damage during extended low-light periods. Both of those protections happen automatically, with no action required from the user.</p>
-            <p>Once deployed — sensor in the soil, panel facing the sun — the device runs by itself. There is nothing to maintain, nothing to charge, nothing to configure. It simply works.</p>
+            <p>Once it is set up, sensor in the soil and panel facing the sun, it looks after itself. Nothing to charge, nothing to configure, nothing to maintain.</p>
           </div>
 
           <div class="prose-section">
             <h4>The Result</h4>
-            <p>Every single component in FarmSense cost ₹1,199 in total — roughly the price of a single meal at a mid-range restaurant. The project was fully functional, cleanly presented, and won first place at the school computer fair.</p>
-            <p>What FarmSense taught me, more than anything else, was what it actually feels like to build something as part of a team rather than alone. Working toward a shared goal — where every person's contribution shapes the final outcome — produces something different than working solo. The alignment we had from the very beginning, that shared clarity about what we were trying to make and why, is what turned a school assignment into something that actually won. That is a quality I intend to bring to every team I build and every business I lead.</p>
+            <p>The finished device cost ₹1,199 in total, roughly the price of one meal at a mid-range restaurant. It was fully functional, cleanly presented, and took first place at the school computer fair.</p>
+            <p>What FarmSense taught me was what it actually feels like to build something with other people rather than alone. Working solo, the only limit is your own effort. Working in a team, the limit is how well three people can hold the same picture in their heads at once. Learning to keep that picture aligned turned out to be a harder and more valuable skill than any part of the build itself.</p>
           </div>
 
           <div class="tech-notes">
             <div class="tech-notes-label" onclick="toggleTechNotes(this)" style="cursor:pointer;">Technical Notes — For Technical Readers <span class="tn-toggle-hint">[ tap to expand ]</span><span class="tn-arrow">▸</span></div>
             <div class="tn-body" style="display:none;">
               <p>FarmSense is built around an ESP32 microcontroller reading from a DHT22 sensor for ambient temperature and relative humidity, and a capacitive probe for soil moisture. All three values display continuously on an OLED screen.</p>
-              <p>The power system is structured as a four-stage chain. A 6V 180mA solar panel feeds an LM2596S buck converter, which steps the input down to a regulated 5V. This output drives a TP4056 lithium-ion charging module, which manages charge delivery to an 18650 cell rated at 2200mAh, enforcing an upper cutoff at approximately 4.2V and disconnecting the load under low-voltage conditions to prevent deep discharge. Downstream of the cell, an MT3608 boost converter produces a stable 5V rail for the ESP32 and all peripherals. Structuring the chain this way keeps each stage isolated, preventing voltage noise from propagating between stages. Total component cost was ₹1,199. The enclosure is custom cardboard with a hand-drawn leaf graphic on the top panel.</p>
+              <p>The power system runs as a four-stage chain. A 6V 180mA solar panel feeds an LM2596S buck converter, which steps the input down to a regulated 5V.</p>
+              <p>That output drives a TP4056 lithium-ion charging module, which manages charge delivery to an 18650 cell rated at 2200mAh. The module enforces an upper cutoff at roughly 4.2V and disconnects the load under low-voltage conditions to prevent deep discharge, so the cell is protected in both directions without anything for the user to manage.</p>
+              <p>Downstream of the cell, an MT3608 boost converter produces the stable 5V rail that supplies the ESP32 and all peripherals. Keeping each conversion stage separate means a fault or fluctuation at one point does not propagate through the rest of the chain.</p>
+              <p>Total component cost was ₹1,199. The enclosure is custom cardboard with a hand-drawn leaf graphic on the top panel.</p>
             </div>
           </div>
 
@@ -675,7 +700,7 @@
 
         <div class="project-summary">
           <p>I fly a military-grade flight simulator called DCS World — think of it as the most realistic aircraft simulation available to the public outside an actual cockpit. For a long time, I had a frustrating problem: both engines on my twin-engine aircraft were controlled by a single lever on my joystick. In combat, when one engine took damage, I had no way to manage the two independently. I needed a dedicated controller with two separate levers — one for each engine — so that even a damaged aircraft could be kept in the air.</p>
-          <p>The hardware I needed starts at around ₹25,000 from commercial brands. At fifteen years old, with no engineering background and no formal training of any kind, I decided to build one from scratch instead. What followed was six months of designing, printing, testing, failing, and redesigning — and what came out the other side taught me about resilience in a way I strive to bring to everything I do.</p>
+          <p>The commercial version of what I needed starts at around ₹25,000. I was fifteen, had never designed anything in three dimensions, and had no training of any kind, so I decided to build one instead. It took six months and I got it wrong far more often than I got it right, but the thing sitting on my desk now works, and I use it almost every day.</p>
         </div>
 <div class="ht-carousel">
             <div class="ht-slides">
@@ -728,21 +753,22 @@
           <div class="prose-section">
             <h4>Where It Began</h4>
             <p>I remember the exact moment the project started. I was studying when a notification appeared on my phone showing a component I had never seen before — a sliding potentiometer. It is a simple part: you slide it back and forth, and the device connected to it reads how far along the slider is. The moment I saw it, I realised that two of these, placed side by side, could act as two completely independent engine levers. A few toggle switches would become buttons. The entire controller I needed could theoretically be built from individual parts for a fraction of what brands were charging.</p>
-            <p>I added the components to my cart, finished my studying, and the project had begun.</p>
+            <p>I added the components to my cart, and the project had begun.</p>
           </div>
 
           <div class="prose-section">
             <h4>Twenty-Eight Redesigns</h4>
-            <p>The most time-consuming part of the entire project was designing the casing — the physical housing that holds all the buttons, switches, and levers in place. I had no prior experience designing objects in three dimensions, so I learned entirely by doing: designing something, printing it, finding all the things that were wrong, and starting again.</p>
+            <p>The most time-consuming part of the whole project was designing the casing, the 3D printed housing that holds every button, switch and lever in place. I had never designed an object in three dimensions before, so I learned by doing it badly: model a part, 3D print it, find everything wrong with it, and start again.</p>
             <p>I went through twenty-eight major versions of the main casing. Many of those versions had multiple sub-versions — small adjustments that each got their own print and test — before being replaced entirely by the next major version. The version numbering started over at version one each time a design changed fundamentally enough to warrant it, and some sub-versions counted up to 0.9 before the next major reset. It was a long process.</p>
-            <p>The key insight that made all of this manageable was realising I did not need to print the full casing each time to check whether measurements were correct. A complete print took seventeen hours. But the critical holes and mounting points all sit at the bottom of the design — which meant printing just the first few layers, which took around twenty minutes, was enough to check whether everything was in the right position. I could find a problem, fix it, and test again all within the same evening. That one realisation compressed what would have been a months-long process of waiting into something I could iterate through quickly.</p>
+            <p>What made this survivable was realising I did not have to print the whole casing to find out whether it was wrong. A full print took seventeen hours. But every hole and mounting point that mattered sat in the first few layers, so printing only those took about twenty minutes and told me everything I needed to know. I could find a problem, fix it and test again in the same evening. That is the only reason getting through twenty-eight versions was ever realistic.</p>
           </div>
 
           <div class="prose-section">
             <h4>Problems Solved Along the Way</h4>
-            <p>My 3D printer had a persistent issue throughout this project: it consistently printed holes slightly smaller than the design specified. Screws and components that should have fit did not. I worked through this in two ways. For holes that were close to the right size, I enlarged them manually using a drill I had improvised from an old electric hair trimmer with a thin blade attachment. For more significant mismatches, I redesigned specific parts to account for the printer's consistent offset rather than fighting it every time.</p>
+            <p>A fair number of parts came off the printer not quite fitting. I dealt with that the obvious way at the time: if a hole was too tight or a slot too narrow, I opened the model, made it bigger, and printed it again. A good share of the twenty-eight versions exist for exactly that reason.</p>
+            <p>One print failed near the top, which left the four mounting holes in the corners of the housing badly formed. Reprinting meant another eighteen hours for the sake of a few millimetres of height, and the rest of the part was perfectly good, so I drilled the holes out by hand instead using a thin blade attachment fitted to an old electric hair trimmer. Not the tool anyone would recommend, but it made four clean holes and saved most of a day.</p>
             <p>I also built something into the controller's software that I am particularly proud of. If you flip one specific switch on the controller before plugging it in, the device changes its behaviour entirely: instead of appearing on the computer as a game controller, it appears as an editable storage drive. This means I can update settings, adjust sensitivity, and change any part of the configuration without ever opening the hardware and without needing any special tools. It was a small design decision, but it made ongoing development and maintenance dramatically cleaner.</p>
-            <p>Later in the build, I noticed that the wiring running from one of the handles was starting to show signs of stress. Every time I moved the throttle to full power and back, the same point in the wire was bending sharply. If I had left it, the wire would eventually have broken at that point. Instead, I redesigned the way the wires were routed so that the tension was spread across three separate sections rather than concentrated at one. I worked that solution out entirely on my own, without looking anything up. The wiring has been running without issue ever since.</p>
+            <p>Later in the build, I noticed that the wiring running from one of the handles was starting to show signs of stress. Every time I moved the throttle to full power and back, the same point in the wire was bending sharply. If I had left it, the wire would eventually have broken at that point. Instead, I redesigned the way the wires were routed so that the tension was spread across three separate sections rather than concentrated at one. The wiring has been running without issue ever since.</p>
           </div>
 
           <div class="prose-section">
@@ -753,16 +779,19 @@
 
           <div class="prose-section">
             <h4>What I Took From It</h4>
-            <p>This project changed the way I see problems. Before it, I was a consumer of technology — someone who used things other people had built. After it, I understood that almost anything can be made by someone willing to iterate past the point where most people give up. The gap between an overpriced solution and no solution at all is not a dead end. It is exactly where the most interesting work happens.</p>
-            <p>That is the insight I want to bring to every business I build. Find where the market is wrong — overpriced, poorly designed, or simply absent — ask whether you can build something better, and keep going until you can.</p>
+            <p>This project changed how I look at objects. Before it, a price tag was the end of the conversation. Afterwards I understood that most things are just a pile of parts and a set of decisions somebody else already made, and that those decisions can be made differently. Twenty-five thousand rupees is a lot to ask for a controller for a game. Twelve hundred rupees of components and six months of my own time was a trade I was glad to make.</p>
+            <p>I should say that I enjoyed almost all of it. There were evenings that made me wonder whether the thing was going to work at all, but the part I remember is sitting back at the end of a session, looking at how much further along it was than when I started, and wanting to get straight back to it. That is still the reason I build things.</p>
           </div>
 
           <div class="tech-notes">
             <div class="tech-notes-label" onclick="toggleTechNotes(this)" style="cursor:pointer;">Technical Notes — For Technical Readers <span class="tn-toggle-hint">[ tap to expand ]</span><span class="tn-arrow">▸</span></div>
             <div class="tn-body" style="display:none;">
-              <p>The controller is built around a Raspberry Pi Pico running MicroPython, presenting to the host PC as a USB HID joystick device. Analog inputs are handled by an MCP3008 eight-channel SPI analog-to-digital converter. The left and right throttle sliders connect to channels 3 and 4 respectively, a rotary potentiometer to channel 2, and the thumbstick TDC slew axis to channel 6. The SPI bus runs on GP10 through GP13.</p>
-              <p>Digital switch inputs are managed through a PCF8575 sixteen-bit I²C GPIO expander, which allows all toggle switches to share a two-wire bus. Each three-position ON-OFF-ON toggle is wired with its common terminal to ground and its UP and DOWN terminals to separate PCF pins. The firmware reads the full sixteen-bit register over I²C and extracts each switch state by isolating the relevant bits. Make-before-break contact behaviour during switching is handled by a state machine that holds the last valid state through any transient condition. The I²C bus runs on GP4 and GP5.</p>
-              <p>Additional inputs connect directly to GPIO: the illuminated Master Arm switch on GP2, a three-way flap selector across GP3 and GP6, four toggle switches, six push buttons, and the thumbstick push-click on GP21. The split-throttle detent uses a pair of neodymium magnets. Boot mode is determined by Master Arm switch position at power-on: the raised position (on, high state) initialises USB mass storage for firmware access; the lowered position (off, low state) initialises HID joystick mode. All systems are fully operational.</p>
+              <p>The controller is built around a Raspberry Pi Pico running MicroPython, presenting to the host PC as a USB HID joystick device. Analog inputs are handled by an MCP3008 eight-channel SPI analog-to-digital converter. The left and right throttle sliders connect to channels 3 and 4 respectively, and a rotary potentiometer to channel 2. The thumbstick used for target designation occupies two further channels, one for each of its X and Y axes, with its push-click read separately as a digital input.</p>
+              <p>The SPI bus is wired GP10 to SCK, GP11 to MOSI, GP12 to MISO and GP13 to chip select.</p>
+              <p>Digital switch inputs are managed through a PCF8575 sixteen-bit I²C GPIO expander, which lets every toggle switch share a single two-wire bus. Each three-position ON-OFF-ON toggle has its common terminal wired to ground and its UP and DOWN terminals to separate PCF pins.</p>
+              <p>The firmware reads the full sixteen-bit register over I²C and extracts each switch state by isolating the relevant bits. Make-before-break contact behaviour during switching is handled by a state machine that holds the last valid state through any transient condition. The I²C bus is wired GP4 to SDA and GP5 to SCL.</p>
+              <p>Additional inputs connect directly to GPIO: the illuminated Master Arm switch on GP2, a three-way flap selector across GP3 and GP6, four toggle switches, six push buttons, and the thumbstick push-click on GP21. The split-throttle detent uses a pair of neodymium magnets.</p>
+              <p>Boot mode is determined by Master Arm switch position at power-on: the raised position (on, high state) initialises USB mass storage for firmware access; the lowered position (off, low state) initialises HID joystick mode.</p>
             </div>
           </div>
 
@@ -790,8 +819,8 @@
         </div>
 
         <div class="project-summary">
-          <p>After finishing the throttle controller, the remaining gap in my simulator setup was rudder pedals — the foot controls that handle aircraft steering and braking. I had been using a workaround on my joystick as a substitute, but it was generating unreliable signals that were causing inconsistent control inputs. For months I had been blaming my own flying for errors that were actually the hardware's fault. I decided it was time to actually solve the problem.</p>
-          <p>The name of this project has a double meaning. RP stands literally for Rudder Pedals — and the name chosen was Red Phoenix, because RP fits both. Red Phoenix — because this project died before it started not once, but twice, and rose from the ashes both times. The name captures exactly how the project unfolded.</p>
+          <p>With the throttle controller finished, the one thing still missing from my setup was a set of rudder pedals, the foot controls an aircraft uses to steer and brake. I had been getting by with a twist function on my joystick, which produced signals just unreliable enough to be a problem. For months I had assumed the resulting mistakes were mine. They were not, and once I worked that out I decided to fix it properly.</p>
+          <p>I called it Red Phoenix for two reasons. RP is short for rudder pedals, which is the boring half. The other half is that this project died twice before a single part was printed, and rose from the ashes both times.</p>
         </div>
 <div class="rp-carousel">
             <div class="rp-slides">
@@ -832,44 +861,46 @@
 
           <div class="prose-section">
             <h4>The First Death — A Fraudulent Website</h4>
-            <p>My original plan was not to build rudder pedals at all. I had just come off six months of intensive work on the throttle controller, and honestly, the idea of immediately starting another full build was not appealing. I decided to simply buy a set this time.</p>
+            <p>My plan was not to build anything. I had just spent six months on the throttle controller, and starting another full build straight away held very little appeal. This time I was going to buy a set like a normal person.</p>
             <p>I found a website that appeared to be selling flight simulation hardware. The price was within a range I was willing to consider. I placed the order, choosing cash on delivery — a decision that turned out to be the only thing that protected me from what came next.</p>
-            <p>The pedals never arrived. Days passed. Then weeks. No update, no tracking, no response. Eventually it became clear that the website was fraudulent — a fake storefront with no real product to deliver. Because I had chosen cash on delivery, I had never paid anything. The financial cost to me was zero. The only thing the scam cost me was the time I had spent waiting, hoping, and eventually accepting that nothing was coming.</p>
-            <p>The project was dead before it had started. Then it came back.</p>
+            <p>The pedals never arrived. Days passed, then weeks, with no tracking and no reply to anything I sent. The site turned out to be a fake storefront with nothing behind it. Choosing cash on delivery meant I never handed over any money, so all it actually took from me was a few weeks of waiting and the slow realisation that nothing was coming.</p>
           </div>
 
           <div class="prose-section">
             <h4>The Second Death — Wrong Mechanics</h4>
-            <p>After the scam, I started looking at what other options existed. There was one commercially available set — a legitimate product from a known manufacturer — priced well above what I was prepared to spend. Before making any decision, I took the time to actually research how rudder pedals work on a real aircraft.</p>
-            <p>What I found was important. Real aircraft rudder pedals slide forward and backward. When the pilot pushes the left pedal forward, the aircraft yaws to the left. When the right pedal goes forward, the aircraft yaws right. This is a sliding, linear movement. In addition, each pedal has an independent toe brake — a small section at the top of the pedal that the pilot can press with the front of their foot to activate the brake on that specific wheel. The left toe brake controls the left main gear, the right toe brake controls the right main gear. This independent braking is how pilots steer on the ground, and it is especially critical for older aircraft types where it is the primary means of directional control during taxiing.</p>
-            <p>The VKB set did neither of these things correctly. Instead of sliding forward and backward, the pedals worked by pressing down — more like a car brake pedal than an aircraft rudder. There was also no independent toe braking on each side. For someone who cares deeply about how aircraft actually function, both of these things were disqualifying. I was being asked to pay a significant sum for something that was mechanically wrong in two fundamental ways. I rejected it.</p>
-            <p>The project was dead a second time. Then it came back again. The Red Phoenix rose.</p>
+            <p>After the scam I went looking at what else was out there. One set came up repeatedly, a legitimate product from a manufacturer people trust, priced well above what I thought pedals were worth. Before spending that much I wanted to understand what I was actually buying, so I went and read about how rudder pedals work on a real aircraft.</p>
+            <p>Two things stood out. Real rudder pedals slide forward and backward: push the left pedal forward and the aircraft yaws left, push the right one forward and it yaws right. It is a linear movement, not a hinge. Second, each pedal carries its own toe brake at the top, which the pilot presses with the front of the foot to brake that side alone. Left pedal brakes the left wheel, right pedal the right. That is how aircraft are steered on the ground, and on older types it is the main way of pointing the thing while taxiing.</p>
+            <p>The set I was looking at did neither. The pedals pressed downward like a car brake instead of sliding, and there was no independent toe braking at all. I was being asked for a serious amount of money for something that got both of the things I cared about wrong. I decided against it.</p>
           </div>
 
           <div class="prose-section">
             <h4>Building It</h4>
-            <p>With buying ruled out twice — once by fraud and once by inadequate design — building was the only remaining option. I could build my own set with the correct mechanics: proper sliding movement and independent toe braking on each side. And I could do it for less money than either option I had tried to purchase.</p>
-            <p>Unlike the throttle controller, which I had designed entirely from scratch, for the rudder pedals I took a different approach. I found an open-source design that another flight simulation enthusiast had shared publicly and decided to use it as my starting foundation. The decision was deliberate — I was not trying to prove I could design everything from zero. I was trying to get functional pedals as efficiently as possible. Using an existing design as a base and adapting it to my needs was the faster and more sensible path.</p>
-            <p>The main challenge throughout the build was the same printer tolerance issue I had dealt with on the throttle controller — parts consistently coming out slightly smaller than the design specified. With my own designs, I had been able to simply adjust dimensions in the model. With someone else's design, changing one dimension could break the fit of neighbouring parts. So I worked around it physically instead: drilling out holes that were too small, creating alternative mounting solutions where the original approach did not fit, and adapting each component until it worked correctly even where it did not look exactly as the original design had intended.</p>
+            <p>Having been defeated twice by the act of simply buying something, building it was what remained. The upside was that I could have the mechanics I actually wanted, sliding travel and a separate brake on each side, for less than either set I had failed to acquire.</p>
+            <p>I had designed the throttle controller from nothing. For the pedals I did the opposite. Another flight simulation enthusiast had already published a design that did what I wanted, so I started from that instead. I was not trying to prove I could do it all myself. I wanted working pedals, and this was plainly the faster route.</p>
+            <p>This is where I finally worked out something I had been living with for months without naming it: my printer consistently produces holes slightly smaller than the design asks for. On the throttle controller that had never registered as a problem, because the files were mine and I simply drew the hole bigger and printed it again. Here the files belonged to someone else, and changing one dimension risks breaking the fit of three parts around it.</p>
+            <p>So I solved it physically instead. Holes that came out undersized were drilled to size, again with the hair trimmer and blade attachment, and where the original design called for hardware that would not seat properly I worked out a different way to mount the part. A fair amount of the build ended up being that kind of quiet problem-solving, adapting somebody else's geometry to a printer that does not quite obey it.</p>
           </div>
 
           <div class="prose-section">
             <h4>The Finished Result</h4>
-            <p>The finished pedals use metal rails and ball bearings to give each pedal smooth, low-friction movement in the correct direction — sliding forward and backward, exactly as real aircraft rudder pedals do. Each foot has its own independent brake, exactly as real aircraft pedals do. Both things that made the commercial option unacceptable are present and functional in what I built for a fraction of that cost.</p>
-            <p>I completed the final assembly on my sixteenth birthday. The left toe brake currently has a loose wire that needs to be re-soldered — a known pending repair. Everything else is fully operational and has been used regularly since the build was completed.</p>
+            <p>Each pedal runs on metal rails and ball bearings and slides forward and backward the way a real one does. Each foot has its own brake. Everything the commercial set got wrong, this one gets right, and it cost a fraction of the price.</p>
+            <p>I completed the final assembly on my sixteenth birthday. The pedals have been in regular use ever since.</p>
           </div>
 
           <div class="prose-section">
             <h4>What It Taught Me</h4>
-            <p>The throttle controller had taught me that building from scratch is a viable response when the market fails you. The rudder pedals taught me something equally important: building from scratch is not always the right response. When a solid foundation already exists, the smarter move is often to take it, adapt it, and improve it — rather than spending months reinventing something that someone else has already solved well.</p>
-            <p>That distinction matters in business too. Innovation does not always mean creating something entirely new. Sometimes it means looking at what already exists, identifying exactly where it falls short, and building on top of it to make something better. That is what I did here — and the result was more functional, more affordable, and more correct than anything I could have bought. I intend to keep asking that question: where does something already exist that I can improve, and where does something need to be built from nothing?</p>
+            <p>The throttle controller taught me that building something yourself is a real answer when the market gets it wrong. The pedals taught me where that stops being true. The geometry had already been worked out by someone who knew what they were doing and shared it openly. Starting again from a blank screen would have cost me months and left me with something worse.</p>
+            <p>That distinction matters well beyond this project. Innovation does not always mean starting from nothing. Often it means finding something that already works, identifying exactly where it falls short, and building on top of it. What I ended up with was more functional, more affordable and mechanically more correct than anything on sale, and getting there took a great deal of adaptation but very little reinvention. Knowing which of those two a problem calls for is the part that actually matters.</p>
           </div>
 
           <div class="tech-notes">
             <div class="tech-notes-label" onclick="toggleTechNotes(this)" style="cursor:pointer;">Technical Notes — For Technical Readers <span class="tn-toggle-hint">[ tap to expand ]</span><span class="tn-arrow">▸</span></div>
             <div class="tn-body" style="display:none;">
-              <p>The pedal geometry is based on a commercially available paid STL file set designed for flight simulation peripherals. The CAD files were used as provided without modification. All physical adaptation was performed during assembly: where printed tolerances were too tight, holes were drilled to achieve the correct clearance, and alternative fastening methods were used where the original design called for hardware that did not fit. The drill used for this purpose was an electric hair trimmer with a thin blade attachment.</p>
-              <p>Each pedal rides on two metal railings with metal ball bearings, providing smooth low-friction travel along the forward-backward axis consistent with how rudder pedals function on a real aircraft. Each pedal has its own independent toe brake, enabling differential braking on left and right sides independently. Filament: PLA.</p>
+              <p>The unit presents to the host PC as a USB HID device, driven by an Arduino Micro. Three rotary potentiometers provide three independent axes: rudder, left toe brake and right toe brake.</p>
+              <p>Each pedal is carried on a mount running on linear ball bearings over two aluminium rods, which gives the forward and backward sliding travel that real rudder pedals use.</p>
+              <p>The two pedal mounts are tied together through a linkage arm to a single rotary potentiometer at the centre of the assembly. Pushing the left pedal forward drives the right pedal back and rotates that potentiometer one way; the opposite input rotates it the other. This converts the linear travel of the pedals into rotation a standard potentiometer can read, without giving up the correct sliding motion. A compression spring in the linkage returns the assembly to centre once pressure is released.</p>
+              <p>Each toe brake is read by its own potentiometer mounted to the side of the pedal. A 3D-printed cog is fitted over the ridged potentiometer shaft and meshes with a matching printed cog on the pedal itself, so pressing the top of the pedal rotates the potentiometer in one direction and releasing it rotates it back. The arrangement is mirrored on both sides, giving genuinely independent left and right braking. Each brake assembly includes a mounting point for a return spring between the moving base and the pedal.</p>
+              <p>The pedal geometry is based on a paid STL file set designed for flight simulation peripherals, used as provided without modification to the CAD. All adaptation was physical: holes were drilled out where printed tolerances came in too tight, and alternative fastening methods were used where the original design called for hardware that did not fit. The drill for this was an electric hair trimmer with a thin blade attachment. Filament throughout is PLA.</p>
             </div>
           </div>
 
@@ -954,14 +985,98 @@
   var rpIndex=0,rpCaptions=["The completed Red Phoenix — both pedals and independent toe brakes fully assembled", "Gears, linkages, and brackets printing simultaneously — many small components needed", "Close-up of a gear and rack component mid-print on the Ender 3 Neo", "Black structural parts fresh off the bed — rails and mounting brackets", "Sliding rail components printed and ready for assembly", "The two pedal faces printed in gray PLA — shown to scale with a 15cm ruler", "Complete parts inventory laid out before assembly — printed components, steel rods, and all hardware", "Mid-assembly — pedal faces, frame, and hardware staged for fitting", "First pedal mounted to the frame — the sliding axis taking shape", "Assembled and wired — both pedals on the frame, potentiometers connected", "Live demo — Red Phoenix rudder pedals in action"];
   function rpShow(n){var sl=document.querySelectorAll('.rp-slide'),dt=document.querySelectorAll('.rp-dot');rpIndex=(n+sl.length)%sl.length;sl.forEach(function(s,i){s.classList.toggle('active',i===rpIndex);});dt.forEach(function(d,i){d.classList.toggle('active',i===rpIndex);});document.getElementById('rpCaption').textContent=rpCaptions[rpIndex];}
   function rpMove(d){rpShow(rpIndex+d);} function rpGo(n){rpShow(n);}
-  function openLightbox(src){document.getElementById('fsLightboxImg').src=src;document.getElementById('fsLightbox').classList.add('open');document.body.style.overflow='hidden';}
+  var certGallery=[
+    {src:'images/prefect-certificate.jpg',      label:'School Prefect · Jeevana School · 2026-27'},
+    {src:'images/debate-certificate.jpg',       label:'Frank Anthony Memorial Debate · 1st Runner-Up · CISCE'},
+    {src:'images/english-ambassador-badge.jpg', label:'Spoken English Excellence · English Ambassador'},
+    {src:'images/farmsense-certificate.jpg',    label:'Project FarmSense · 1st Place · School Computer Fair'}
+  ];
+  var lbIndex=-1;
+  function openLightbox(src){
+    var box=document.getElementById('fsLightbox');
+    lbIndex=-1;
+    for(var i=0;i<certGallery.length;i++){ if(src.indexOf(certGallery[i].src)>-1){ lbIndex=i; break; } }
+    document.getElementById('fsLightboxImg').src=src;
+    if(lbIndex>-1){
+      box.classList.add('gallery');
+      var cap=document.getElementById('lbCaption'); if(cap) cap.textContent=certGallery[lbIndex].label;
+    } else {
+      box.classList.remove('gallery');
+    }
+    box.classList.add('open');
+    document.body.style.overflow='hidden';
+  }
+  function lbStep(d){
+    if(lbIndex<0) return;
+    lbIndex=(lbIndex+d+certGallery.length)%certGallery.length;
+    document.getElementById('fsLightboxImg').src=certGallery[lbIndex].src;
+    var cap=document.getElementById('lbCaption'); if(cap) cap.textContent=certGallery[lbIndex].label;
+  }
   function closeLightbox(){document.getElementById('fsLightbox').classList.remove('open');document.body.style.overflow='';}
-  document.addEventListener('keydown',function(e){if(e.key==='Escape')closeLightbox();});
+  (function(){
+    var lb=document.getElementById('fsLightbox'), x0=null, y0=null;
+    if(!lb) return;
+    lb.addEventListener('touchstart',function(e){ x0=e.touches[0].clientX; y0=e.touches[0].clientY; },{passive:true});
+    lb.addEventListener('touchmove',function(e){
+      if(x0===null) return;
+      var dx=e.touches[0].clientX-x0, dy=e.touches[0].clientY-y0;
+      if(Math.abs(dx)>Math.abs(dy)) e.preventDefault();
+    },{passive:false});
+    lb.addEventListener('touchend',function(e){
+      if(x0===null) return;
+      var dx=e.changedTouches[0].clientX-x0, dy=e.changedTouches[0].clientY-y0;
+      if(Math.abs(dx)>50 && Math.abs(dx)>Math.abs(dy)) lbStep(dx<0?1:-1);
+      x0=null; y0=null;
+    },{passive:true});
+  })();
+  function attachSwipe(sel,fn){
+    document.querySelectorAll(sel).forEach(function(el){
+      var x0=null,y0=null;
+      el.addEventListener('touchstart',function(e){ x0=e.touches[0].clientX; y0=e.touches[0].clientY; },{passive:true});
+      el.addEventListener('touchmove',function(e){
+        if(x0===null) return;
+        var dx=e.touches[0].clientX-x0, dy=e.touches[0].clientY-y0;
+        if(Math.abs(dx)>Math.abs(dy)) e.preventDefault();
+      },{passive:false});
+      el.addEventListener('touchend',function(e){
+        if(x0===null) return;
+        var dx=e.changedTouches[0].clientX-x0, dy=e.changedTouches[0].clientY-y0;
+        if(Math.abs(dx)>45 && Math.abs(dx)>Math.abs(dy)) fn(dx<0?1:-1);
+        x0=null;y0=null;
+      },{passive:true});
+    });
+  }
+  attachSwipe('.fs-carousel', fsMove);
+  attachSwipe('.ht-carousel', htMove);
+  attachSwipe('.rp-carousel', rpMove);
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape') closeLightbox();
+    if(document.getElementById('fsLightbox').classList.contains('open')){
+      if(e.key==='ArrowRight') lbStep(1);
+      if(e.key==='ArrowLeft')  lbStep(-1);
+    }
+  });
+  function toggleAbout(){
+    var m=document.getElementById('aboutMore'), b=document.getElementById('aboutMoreBtn');
+    if(m.classList.contains('open')){
+      m.classList.add('closing');
+      b.textContent='Read More About Me ↓';
+      setTimeout(function(){ m.classList.remove('open','closing'); }, 340);
+    } else {
+      m.classList.add('open');
+      b.textContent='Show Less ↑';
+    }
+  }
   function toggleTechNotes(label){var b=label.nextElementSibling,a=label.querySelector('.tn-arrow');if(b.style.display==='none'){b.style.display='block';a.style.transform='rotate(90deg)';}else{b.style.display='none';a.style.transform='rotate(0deg)';}}
 </script>
 
   <div id="fsLightbox" onclick="closeLightbox()">
+    <button id="lbClose" onclick="event.stopPropagation();closeLightbox()" aria-label="Close">&#10005;</button>
+    <button id="lbPrev" onclick="event.stopPropagation();lbStep(-1)">&#8592;</button>
     <img id="fsLightboxImg" src="" alt="enlarged">
+    <button id="lbNext" onclick="event.stopPropagation();lbStep(1)">&#8594;</button>
+    <div id="lbHint">Tap outside to close</div>
+    <div id="lbCaption"></div>
   </div>
 </body>
 </html>
